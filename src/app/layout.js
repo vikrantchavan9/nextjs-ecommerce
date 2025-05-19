@@ -2,6 +2,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { CartProvider } from "./context/cart-context";
+import React from 'react';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,11 +28,15 @@ export default function RootLayout({ children }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body>
-        <Navbar />
-        <main className="min-h-[calc(100vh-128px)]">
-          {children}
-        </main>
-        <Footer />
+        <React.StrictMode>
+          <Navbar />
+          <main className="min-h-[calc(100vh-128px)]">
+            <CartProvider>
+              {children}
+            </CartProvider>
+          </main>
+          <Footer />
+        </React.StrictMode>
       </body>
     </html>
   );

@@ -1,19 +1,12 @@
 "use client";
 import Image from "next/image";
-
-import { useRouter } from 'next/navigation';
+import Link from "next/link";
 
 export default function ProductCard({ product }) {
 
-    const router = useRouter();
-
-  const handleClick = () => {
-    router.push(`/products/${product.id}`);
-  };
-
   return (
-    
-      <div onClick={handleClick} className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition">
+    <Link href={`/products/${product.id}`} className="block">
+      <div className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition">
         <div className="relative h-52 w-full bg-gray-100">
           {product.images?.[0] ? (
             <Image
@@ -33,6 +26,6 @@ export default function ProductCard({ product }) {
           <p className="mt-2 font-semibold text-slate-900">${product.price}</p>
         </div>
       </div>
-    
+    </Link>
   );
 }

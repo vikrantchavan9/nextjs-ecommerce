@@ -1,8 +1,11 @@
 import Image from "next/image";
+import ProductDetailsClient from "@/components/ProductDetailsClient";
 
 export default async function ProductPage({ params }) {
-  const { id } = params;
-  let product;
+params = await params;  // resolves promise if it is one, no harm if it's not
+const { id } = params;
+
+  let product = null;
 
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${id}`, {
@@ -28,13 +31,14 @@ export default async function ProductPage({ params }) {
         />
       </div>
       <div>
-        <h1 className="text-2xl text-gray-900 font-bold mb-2">{product.name}</h1>
+        <h1 className="text-2xl text-black font-bold mb-2">{product.name}</h1>
         <p className="text-gray-600 mb-4">{product.description}</p>
         <p className="text-xl font-semibold text-slate-900">${product.price}</p>
         <button className="mt-6 px-6 py-3 bg-black text-white rounded hover:bg-slate-800 transition">
           Add to Cart
         </button>
       </div>
+      <ProductDetailsClient product={product} />
     </div>
   );
 }
