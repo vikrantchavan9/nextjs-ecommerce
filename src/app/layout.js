@@ -21,6 +21,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={` ${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
       <body>
         <Navbar />
         <main className="min-h-[calc(100vh-128px)]">

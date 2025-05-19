@@ -1,65 +1,40 @@
-// app/products/[id]/page.jsx
-// This is a Server Component. It fetches data on the server.
+import Image from "next/image";
 
-import { notFound } from 'next/navigation'; // For displaying 404
-import { query } from '@/lib/db'; // Import server-side query function
-import ProductDetailsClient from '@/components/ProductDetailsClient'; // Import the client component for interactivity
+export default async function ProductPage({ params }) {
+  const { id } = params;
+  let product;
 
-// Data fetching function (runs on the server)
-async function getProductById(id) {
   try {
-    console.log("Attempting to fetch product with ID:", id);
-    const result = await query('SELECT id, name, price, description, image_url, image_gallery FROM products WHERE id = $1', [id]);
-    console.log("DB Query Result for single product:", result.rows);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${id}`, {
+      cache: "no-store",
+    });
 
-    if (result.rows.length > 0) {
-      const product = result.rows[0];
-      let images = [product.image_url]; // Default to main image_url
+    if (!res.ok) throw new Error("Failed to fetch product");
 
-      // If image_gallery column exists and is a JSON string, parse it
-      if (product.image_gallery) {
-        try {
-          const gallery = JSON.parse(product.image_gallery);
-          if (Array.isArray(gallery) && gallery.length > 0) {
-            images = gallery;
-          }
-        } catch (e) {
-          console.warn('Failed to parse image_gallery as JSON for product ID:', id, e);
-          // Fallback to single image_url if parsing fails
-        }
-      }
-
-      return {
-        id: product.id,
-        name: product.name,
-        price: parseFloat(product.price),
-        description: product.description,
-        imageUrl: product.image_url, // Main image URL
-        images: images, // Array of images for gallery
-      };
-    }
-    console.log("Product not found in DB for ID:", id);
-    return null; // Product not found in database
+    product = await res.json();
   } catch (error) {
-    console.error(`ERROR: Failed to fetch product with ID ${id}:`, error);
-    return null; // Return null on database error
-  }
-}
-
-// Main page component for the dynamic route
-export default async function SingleProductPage({ params }) {
-  console.log("SingleProductPage rendering for params:", params);
-  const { id } = params; // Extract the dynamic ID from the URL
-
-  const product = await getProductById(id); // Fetch product data
-
-  if (!product) {
-    console.log("Calling notFound() for product ID:", id);
-    notFound(); // Triggers Next.js's 404 page if product is not found
+    console.error("Error:", error.message);
+    return <div className="p-10 text-black">Failed to load product.</div>;
   }
 
-  // Pass the fetched product data to the client component for rendering
   return (
-    <ProductDetailsClient product={product} />
+    <div className="max-w-5xl mx-auto py-12 px-4 grid md:grid-cols-2 gap-8">
+      <div className="relative h-96 w-full bg-gray-100">
+        <Image
+          src={product.images?.[0] || "/placeholder.jpg"}
+          alt={product.name}
+          fill
+          className="object-cover rounded-xl"
+        />
+      </div>
+      <div>
+        <h1 className="text-2xl text-gray-900 font-bold mb-2">{product.name}</h1>
+        <p className="text-gray-600 mb-4">{product.description}</p>
+        <p className="text-xl font-semibold text-slate-900">${product.price}</p>
+        <button className="mt-6 px-6 py-3 bg-black text-white rounded hover:bg-slate-800 transition">
+          Add to Cart
+        </button>
+      </div>
+    </div>
   );
 }
