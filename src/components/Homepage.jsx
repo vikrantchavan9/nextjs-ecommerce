@@ -22,8 +22,8 @@ export default async function Homepage () {
       </section>
 
       {/* Product Grid */}
-      <section className="max-w-7xl mx-auto py-16 px-4">
-        <h2 className="text-2xl text-black font-bold mb-6">Featured Products</h2>
+              <h2 className="text-2xl text-black pt-8 px-8 font-bold">Featured Products</h2>
+      <section className="max-w-7xl mx-auto py-8 px-8">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {Array.isArray(products) && products.length > 0 ? (
             products.map((product) => (
