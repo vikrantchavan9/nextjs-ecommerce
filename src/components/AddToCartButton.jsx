@@ -2,7 +2,7 @@
 
 import { useCart } from '../app/context/cart-context';
 
-export default function ProductDetailsClient({ product }) {
+export default function AddToCartButton({ product }) {
   
   const { addToCart } = useCart();
 
@@ -13,7 +13,7 @@ const handleAddToCart = () => {
 
   return (
     <div>
-      <button className='mt-6 px-6 py-3 bg-black text-white rounded hover:bg-slate-800 transition' onClick={handleAddToCart}>Add to Cart</button>
+      <button className='mt-8 px-6 py-2 bg-black text-white rounded hover:bg-slate-800 transition' onClick={handleAddToCart}>Add to Cart</button>
     </div>
   );
 }

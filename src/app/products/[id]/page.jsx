@@ -1,10 +1,9 @@
-import Image from "next/image";
-import ProductDetailsClient from "@/components/ProductDetailsClient";
+import AddToCartButton from "@/components/AddToCartButton";
+import ProductImageSlider from "@/components/ProductImageSlider";
 
 export default async function ProductPage({ params }) {
 params = await params;  // resolves promise if it is one, no harm if it's not
 const { id } = params;
-
   let product = null;
 
   try {
@@ -21,21 +20,21 @@ const { id } = params;
   }
 
   return (
-    <div className="max-w-5xl mx-auto py-12 px-4 grid md:grid-cols-2 gap-8">
-      <div className="relative h-96 w-full bg-gray-100">
-        <Image
-          src={product.images?.[0] || "/placeholder.jpg"}
-          alt={product.name}
-          fill
-          className="object-cover rounded-xl"
-        />
+    <div className="bg-gray-200 max-w-5xl mx-auto py-12 px-4 grid md:grid-cols-2 gap-8">
+      {/* Client-side Image Slider */}
+      <ProductImageSlider images={product.images} />
+      
+      <div className="p-2">
+        <h1 className="text-sm mb-8 text-black">⭐⭐⭐⭐☆ (4.2/5 based on 12 reviews)</h1>
+        <h1 className="text-2xl text-black font-semibold ">{product.name}</h1>
+        <p className="text-lg font-semibold text-slate-900">${product.price}</p>
+        
+        <AddToCartButton product={product} />
+
+        <p className="text-black text-sm my-10 h-2h">Description: <br />{product.description}</p>
+        <p className="text-black text-sm my-10 h-2h">Delivered in 3-5 days | Easy 7-day return</p>
       </div>
-      <div>
-        <h1 className="text-2xl text-black font-bold mb-2">{product.name}</h1>
-        <p className="text-black mb-4">{product.description}</p>
-        <p className="text-xl font-semibold text-slate-900">${product.price}</p>
-      </div>
-      <ProductDetailsClient product={product} />
+      
     </div>
   );
 }

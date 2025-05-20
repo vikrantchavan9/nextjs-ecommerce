@@ -61,8 +61,8 @@ const Navbar = () => {
           <Link href="/cart" className="hover:text-gray-300">
             Cart
           </Link>
-          <Link href="/collections" className="hover:text-gray-300">
-            Collections
+          <Link href="/order" className="hover:text-gray-300">
+            Your Orders
           </Link>
           <Link href="/about" className="hover:text-gray-300">
             About
@@ -132,8 +132,8 @@ const Navbar = () => {
           <Link href="/cart" className="block py-2 hover:bg-gray-600 rounded">
             Cart
           </Link>
-          <Link href="/collections" className="block py-2 hover:bg-gray-600 rounded">
-            Collections
+          <Link href="/order" className="block py-2 hover:bg-gray-600 rounded">
+            Your Orders
           </Link>
           <Link href="/about" className="block py-2 hover:bg-gray-600 rounded">
             About
