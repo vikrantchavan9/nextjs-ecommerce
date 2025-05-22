@@ -1,127 +1,47 @@
-'use client'; // needed for client-side interactivity (like event handlers)
-
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+// shop/page.jsx (App Router)
 import ProductCard from '@/components/ProductCard';
+import SortFilterControls from '@/components/SortFilterControls'; // Import the client component
+import { Suspense } from 'react';
 
-export default function ShopPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+export default async function ShopPage({ searchParams }) {
+  const sortBy = searchParams.sortBy || '';
+  const category = searchParams.category || '';
+  const section = searchParams.section || '';
 
-  // Get current filter/sort values from URL query params
-  const sortBy = searchParams.get('sortBy') || '';
-  const category = searchParams.get('category') || '';
-  const section = searchParams.get('section') || '';
+  // Construct the URL for the API call
+  const queryParams = new URLSearchParams();
+  if (sortBy) queryParams.set('sortBy', sortBy);
+  if (category) queryParams.set('category', category);
+  if (section) queryParams.set('section', section);
 
-  // Local state to hold fetched products and loading/error states
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // Ensure process.env.NEXT_PUBLIC_BASE_URL is defined in .env.local
+  const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/products?${queryParams.toString()}`;
 
-  // Fetch products whenever filters or sorting change
-  useEffect(() => {
-    async function fetchProducts() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const query = new URLSearchParams({
-          sortBy,
-          category,
-          section,
-        }).toString();
-
-        const res = await fetch(`/api/products?${query}`);
-
-        if (!res.ok) {
-          throw new Error(`Failed to load products: ${res.statusText}`);
-        }
-
-        const data = await res.json();
-        setProducts(data);
-      } catch (err) {
-        setError(err.message);
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
+  let products = [];
+  try {
+    // 'no-store' ensures data is always fresh, not cached statically by Next.js
+    const res = await fetch(apiUrl, { cache: 'no-store' });
+    if (!res.ok) {
+      throw new Error(`Failed to fetch products: ${res.statusText}`);
     }
-
-    fetchProducts();
-  }, [sortBy, category, section]);
-
-  // Helper: update URL query params when user changes filters/sorting
-  function updateFilters(newFilters) {
-    const params = new URLSearchParams({
-      sortBy,
-      category,
-      section,
-      ...newFilters,
-    });
-
-    // Remove empty params for cleanliness
-    for (const [key, value] of params.entries()) {
-      if (!value) params.delete(key);
-    }
-
-    router.push(`/shop?${params.toString()}`);
+    products = await res.json();
+  } catch (error) {
+    console.error('Error fetching products in ShopPage:', error);
+    // In a production app, you might want a more user-friendly error display
   }
 
   return (
-    <div className="p-6">
-      {/* Filter and sort controls */}
-      <div className="flex flex-wrap gap-4 mb-6">
-        {/* Sort By Price */}
-        <select
-          value={sortBy}
-          onChange={e => updateFilters({ sortBy: e.target.value })}
-          className="border p-2 rounded"
-        >
-          <option value="">Sort by price</option>
-          <option value="price_asc">Price: Low to High</option>
-          <option value="price_desc">Price: High to Low</option>
-        </select>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6 text-slate-800">Our Products</h1>
+      <Suspense fallback={<div>Loading filters...</div>}>
+        {/* Render the client component without passing functions as props */}
+        <SortFilterControls />
+      </Suspense>
 
-        {/* Category */}
-        <select
-          value={category}
-          onChange={e => updateFilters({ category: e.target.value })}
-          className="border p-2 rounded"
-        >
-          <option value="">All Categories</option>
-          <option value="t-shirt">T-Shirt</option>
-          <option value="trouser">Trouser</option>
-          <option value="sweater">Sweater</option>
-          <option value="skirt">Skirt</option>
-          <option value="dress">Dress</option>
-          <option value="accessories">Accessories</option>
-        </select>
-
-        {/* Section */}
-        <select
-          value={section}
-          onChange={e => updateFilters({ section: e.target.value })}
-          className="border p-2 rounded"
-        >
-          <option value="">All Sections</option>
-          <option value="men">Men</option>
-          <option value="woman">Woman</option>
-          <option value="kids">Kids</option>
-          <option value="unisex">Unisex</option>
-        </select>
-      </div>
-
-      {/* Loading/Error */}
-      {loading && <p>Loading products...</p>}
-      {error && <p className="text-red-600">Error: {error}</p>}
-
-      {/* Products Grid */}
-      {!loading && !error && products.length === 0 && (
-        <p>No products found.</p>
-      )}
-
-      {!loading && !error && products.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+      {products.length === 0 ? (
+        <p className="text-center text-black">No products found matching your criteria.</p>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}
