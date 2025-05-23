@@ -10,6 +10,7 @@ export default async function Homepage () {
   const res = await fetch(`${baseUrl}/api/products`, {
     cache: 'no-store',
   });
+  
   const products = await res.json();
   return (
     <>
