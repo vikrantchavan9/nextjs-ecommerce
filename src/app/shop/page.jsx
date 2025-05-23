@@ -1,5 +1,5 @@
 'use client';
-
+import { Suspense } from 'react';
 import ShopProducts from '@/app/context/shoppage';
 import ProductCard from '@/components/ProductCard';
 import SortFilterControls from '@/components/SortFilterControls';
@@ -8,6 +8,7 @@ export default function ShopPage() {
   const { products, loading } = ShopProducts();
 
   return (
+    <Suspense fallback={<div>Loading...</div>}>
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 text-slate-800">Our Products</h1>
       <SortFilterControls />
@@ -24,5 +25,6 @@ export default function ShopPage() {
         </div>
       )}
     </div>
+    </Suspense>
   );
 }
