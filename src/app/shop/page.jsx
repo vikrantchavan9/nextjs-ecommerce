@@ -1,42 +1,46 @@
-// shop/page.jsx (App Router)
+'use client';
+
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import ProductCard from '@/components/ProductCard';
-import SortFilterControls from '@/components/SortFilterControls'; // Import the client component
-import { Suspense } from 'react';
+import SortFilterControls from '@/components/SortFilterControls';
 
-export default async function ShopPage({ searchParams }) {
-  const sortBy = searchParams.sortBy || '';
-  const category = searchParams.category || '';
-  const section = searchParams.section || '';
+export default function ShopPage() {
+  const searchParams = useSearchParams();
 
-  // Construct the URL for the API call
-  const queryParams = new URLSearchParams();
-  if (sortBy) queryParams.set('sortBy', sortBy);
-  if (category) queryParams.set('category', category);
-  if (section) queryParams.set('section', section);
+  const sortBy = searchParams.get('sortBy') || '';
+  const category = searchParams.get('category') || '';
+  const section = searchParams.get('section') || '';
 
-  // Ensure process.env.NEXT_PUBLIC_BASE_URL is defined in .env.local
-  const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/products?${queryParams.toString()}`;
+  const [products, setProducts] = useState([]);
 
-  let products = [];
-  try {
-    // 'no-store' ensures data is always fresh, not cached statically by Next.js
-    const res = await fetch(apiUrl, { cache: 'no-store' });
-    if (!res.ok) {
-      throw new Error(`Failed to fetch products: ${res.statusText}`);
-    }
-    products = await res.json();
-  } catch (error) {
-    console.error('Error fetching products in ShopPage:', error);
-    // In a production app, you might want a more user-friendly error display
-  }
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const queryParams = new URLSearchParams();
+      if (sortBy) queryParams.set('sortBy', sortBy);
+      if (category) queryParams.set('category', category);
+      if (section) queryParams.set('section', section);
+
+      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/products?${queryParams.toString()}`;
+
+      try {
+        const res = await fetch(apiUrl, { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = await res.json();
+        setProducts(data);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        setProducts([]);
+      }
+    };
+
+    fetchProducts();
+  }, [sortBy, category, section]);
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 text-slate-800">Our Products</h1>
-      <Suspense fallback={<div>Loading filters...</div>}>
-        {/* Render the client component without passing functions as props */}
-        <SortFilterControls />
-      </Suspense>
+      <SortFilterControls />
 
       {products.length === 0 ? (
         <p className="text-center text-black">No products found matching your criteria.</p>

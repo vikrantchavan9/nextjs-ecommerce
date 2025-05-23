@@ -1,48 +1,40 @@
 // src/lib/products.js
 
-import { query } from './db'; // your DB query function
+import { supabase } from './supabase';
 
 export async function fetchAllProducts({
      sortBy = 'id',
-     sortOrder = 'ASC',
+     sortOrder = 'asc',
      category,
      section,
 } = {}) {
      try {
           const allowedSortFields = ['id', 'price', 'name'];
-          const allowedSortOrders = ['ASC', 'DESC'];
+          const allowedSortOrders = ['asc', 'desc'];
 
-          // Validate sort inputs
+          // Validate inputs
           if (!allowedSortFields.includes(sortBy)) sortBy = 'id';
-          if (!allowedSortOrders.includes(sortOrder.toUpperCase())) sortOrder = 'ASC';
+          if (!allowedSortOrders.includes(sortOrder.toLowerCase())) sortOrder = 'asc';
 
-          // Build query dynamically
-          let queryString = `
-      SELECT id, name, description, price, images, category, section
-      FROM products
-    `;
-          const values = [];
-          const conditions = [];
+          let query = supabase
+               .from('products')
+               .select('id, name, description, price, images, category, section');
 
           if (category) {
-               values.push(category);
-               conditions.push(`category = $${values.length}`);
+               query = query.eq('category', category);
           }
 
           if (section) {
-               values.push(section);
-               conditions.push(`section = $${values.length}`);
+               query = query.eq('section', section);
           }
 
-          if (conditions.length > 0) {
-               queryString += ' WHERE ' + conditions.join(' AND ');
-          }
+          query = query.order(sortBy, { ascending: sortOrder.toLowerCase() === 'asc' });
 
-          queryString += ` ORDER BY ${sortBy} ${sortOrder}`;
+          const { data, error } = await query;
 
-          const result = await query(queryString, values);
+          if (error) throw error;
 
-          const products = result.rows.map((row) => ({
+          const products = data.map((row) => ({
                id: row.id,
                name: row.name,
                description: row.description,
@@ -65,7 +57,7 @@ export async function fetchAllProducts({
 
           return products;
      } catch (error) {
-          console.error('Failed to fetch products:', error);
+          console.error('Failed to fetch products:', error.message);
           return [];
      }
 }

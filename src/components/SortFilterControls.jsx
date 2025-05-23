@@ -62,7 +62,7 @@ export default function SortFilterControls() {
   const sectionOptions = [
     { value: '', name: 'All Sections' },
     { value: 'men', name: 'Men' },
-    { value: 'woman', name: 'Woman' },
+    { value: 'women', name: 'Women' },
     { value: 'kids', name: 'Kids' },
     { value: 'unisex', name: 'Unisex' },
   ];

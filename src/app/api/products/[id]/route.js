@@ -1,6 +1,6 @@
 // app/api/products/[id]/route.js
 import { NextResponse } from 'next/server';
-import { query } from '@/lib/db';
+import { query } from '@/lib/supabase';
 
 export async function GET(request) {
      try {
