@@ -5,10 +5,9 @@ export default async function ProductPage({ params }) {
 params = await params;  // resolves promise if it is one, no harm if it's not
 const { id } = params;
   let product = null;
-  const baseUrl = request.nextUrl.origin;
 
   try {
-    const res = await fetch(`${baseUrl}/api/products/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${id}`, {
       cache: "no-store",
     });
 
