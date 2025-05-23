@@ -2,7 +2,12 @@ import ProductCard from "./ProductCard";
 import Link from "next/link";
 
 export default async function Homepage () {
-       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`, {
+  const baseUrl =
+    process.env.NODE_ENV === 'development'
+      ? 'http://localhost:3000'
+      : process.env.NEXT_PUBLIC_API_URL;
+
+  const res = await fetch(`${baseUrl}/api/products`, {
     cache: 'no-store',
   });
   const products = await res.json();
