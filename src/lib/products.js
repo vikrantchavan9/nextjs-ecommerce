@@ -61,3 +61,41 @@ export async function fetchAllProducts({
           return [];
      }
 }
+
+export async function fetchProductById(id) {
+     try {
+          const { data, error } = await supabase
+               .from('products')
+               .select('id, name, description, price, images, category, section')
+               .eq('id', id)
+               .single();
+
+          if (error) throw error;
+
+          if (!data) return null;
+
+          return {
+               id: data.id,
+               name: data.name,
+               description: data.description,
+               price: parseFloat(data.price),
+               category: data.category,
+               section: data.section,
+               images: (() => {
+                    if (!data.images) return [];
+                    if (Array.isArray(data.images)) return data.images;
+                    if (typeof data.images === 'string') {
+                         try {
+                              return JSON.parse(data.images);
+                         } catch {
+                              return [data.images];
+                         }
+                    }
+                    return [];
+               })(),
+          };
+     } catch (error) {
+          console.error('Failed to fetch product by id:', error.message);
+          return null;
+     }
+}

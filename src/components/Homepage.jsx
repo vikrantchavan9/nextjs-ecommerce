@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import ProductCard from "./ProductCard";
 import Link from "next/link";
 
