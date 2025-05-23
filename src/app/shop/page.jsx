@@ -7,6 +7,7 @@ export default async function ShopPage({ searchParams }) {
   const sortBy = searchParams.sortBy || '';
   const category = searchParams.category || '';
   const section = searchParams.section || '';
+  const baseUrl = request.nextUrl.origin;
 
   // Construct the URL for the API call
   const queryParams = new URLSearchParams();
@@ -15,7 +16,7 @@ export default async function ShopPage({ searchParams }) {
   if (section) queryParams.set('section', section);
 
   // Ensure process.env.NEXT_PUBLIC_BASE_URL is defined in .env.local
-  const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/products?${queryParams.toString()}`;
+  const apiUrl = `${baseUrl}/api/products?${queryParams.toString()}`;
 
   let products = [];
   try {

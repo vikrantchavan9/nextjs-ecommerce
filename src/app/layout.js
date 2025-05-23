@@ -30,7 +30,7 @@ export default function RootLayout({ children }) {
       <body>
         <React.StrictMode>
           <Navbar />
-          <main className="min-h-[calc(100vh-128px)]">
+          <main className="min-h-[calc(100vh-128px)] ">
             <CartProvider>
               {children}
             </CartProvider>

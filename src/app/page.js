@@ -2,7 +2,8 @@
 import Homepage from "@/components/Homepage";
 
 async function getProducts() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`, {
+  const baseUrl = request.nextUrl.origin;
+  const res = await fetch(`${baseUrl}/api/products`, {
     cache: 'no-store', // ensure freshness in dev
   });
   return res.json();
