@@ -4,18 +4,13 @@ import ShopProducts from '@/app/context/shoppage';
 import ProductCard from '@/components/ProductCard';
 import SortFilterControls from '@/components/SortFilterControls';
 
-export default function ShopPage() {
+function ShopContent() {
   const { products, loading } = ShopProducts();
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 text-slate-800">Our Products</h1>
-
-      {/* Wrap SortFilterControls in Suspense */}
-      <Suspense fallback={<div>Loading filters...</div>}>
-        <SortFilterControls />
-      </Suspense>
-
+      <SortFilterControls />
       {loading ? (
         <p className="text-center text-black">Loading products...</p>
       ) : products.length === 0 ? (
@@ -28,5 +23,13 @@ export default function ShopPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-10">Loading shop...</div>}>
+      <ShopContent />
+    </Suspense>
   );
 }
