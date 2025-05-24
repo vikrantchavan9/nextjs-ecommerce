@@ -17,8 +17,8 @@ const Footer = () => {
           <Link href="/contact" className="hover:text-gray-300 mb-1">
             Contact Us
           </Link>
-          <Link href="/collections" className="hover:text-gray-300">
-            Collections
+          <Link href="/shop" className="hover:text-gray-300">
+            View all Products
           </Link>
         </div>
 

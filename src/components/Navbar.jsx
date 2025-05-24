@@ -20,6 +20,10 @@ const Navbar = () => {
             Home
           </Link>
 
+           <Link href="/shop" className="hover:text-gray-300">
+            Shop
+          </Link>
+
           {/* Sections Dropdown */}
           <div
             className="relative"
@@ -42,16 +46,16 @@ const Navbar = () => {
             </button>
             {isSectionsDropdownOpen && (
               <div className="absolute left-0 mt-2 w-48 bg-white text-gray-800 rounded-md shadow-lg py-1 z-10">
-                <Link href="/products?section=men" className="block px-4 py-2 hover:bg-gray-100">
+                <Link href="/shop?section=men" className="block px-4 py-2 hover:bg-gray-100">
                   Men
                 </Link>
-                <Link href="/products?section=women" className="block px-4 py-2 hover:bg-gray-100">
+                <Link href="/shop?section=women" className="block px-4 py-2 hover:bg-gray-100">
                   Women
                 </Link>
-                <Link href="/products?section=kids" className="block px-4 py-2 hover:bg-gray-100">
+                <Link href="/shop?section=kids" className="block px-4 py-2 hover:bg-gray-100">
                   Kids
                 </Link>
-                <Link href="/products?section=unisex" className="block px-4 py-2 hover:bg-gray-100">
+                <Link href="/shop?section=unisex" className="block px-4 py-2 hover:bg-gray-100">
                   Unisex
                 </Link>
               </div>
@@ -94,6 +98,9 @@ const Navbar = () => {
           <Link href="/" className="block py-2 hover:bg-gray-600 rounded">
             Home
           </Link>
+          <Link href="/shop" className="block py-2 hover:bg-gray-600 rounded">
+            Explore
+          </Link>
           <div className="py-2">
             <button
               onClick={() => setIsSectionsDropdownOpen(!isSectionsDropdownOpen)}
@@ -114,16 +121,16 @@ const Navbar = () => {
             </button>
             {isSectionsDropdownOpen && (
               <div className="pl-4 mt-2">
-                <Link href="/products?section=men" className="block py-2 hover:bg-gray-600 rounded">
+                <Link href="/shop?section=men" className="block py-2 hover:bg-gray-600 rounded">
                   Men
                 </Link>
-                <Link href="/products?section=women" className="block py-2 hover:bg-gray-600 rounded">
+                <Link href="/shop?section=women" className="block py-2 hover:bg-gray-600 rounded">
                   Women
                 </Link>
-                <Link href="/products?section=kids" className="block py-2 hover:bg-gray-600 rounded">
+                <Link href="/shop?section=kids" className="block py-2 hover:bg-gray-600 rounded">
                   Kids
                 </Link>
-                <Link href="/products?section=unisex" className="block py-2 hover:bg-gray-600 rounded">
+                <Link href="/shop?section=unisex" className="block py-2 hover:bg-gray-600 rounded">
                   Unisex
                 </Link>
               </div>

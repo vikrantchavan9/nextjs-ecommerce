@@ -70,7 +70,6 @@ export default function SortFilterControls() {
 
   return (
     <Suspense fallback={<div>Loading filters...</div>}>
-    // Apply your custom font globally here (e.g., font-sans) or ensure it's inherited from layout.jsx
     <div className="mb-6 flex flex-wrap gap-3 items-center font-sans text-sm">
 
       {/* Sort By Dropdown */}

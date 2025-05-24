@@ -6,7 +6,7 @@ export default async function Homepage () {
   const baseUrl =
     process.env.NODE_ENV === 'development'
       ? 'http://localhost:3000'
-      : process.env.NEXT_PUBLIC_API_URL;
+      : process.env.NEXT_PUBLIC_BASE_URL;
 
   const res = await fetch(`${baseUrl}/api/products`, {
     cache: 'no-store',

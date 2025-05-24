@@ -72,7 +72,7 @@ const CartPage = () => {
         <h3>Grand Total: ${grandTotal.toFixed(2)}</h3>
         <button
           onClick={handleCheckout}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-900"
         >
           Checkout
         </button>
