@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase'; // Make sure this path is correct
 
 export async function GET(request) {
+
      const { searchParams } = new URL(request.url);
      const sortBy = searchParams.get('sortBy');
      const category = searchParams.get('category');

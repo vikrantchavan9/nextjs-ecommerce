@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import Homepage from "@/components/Homepage";
 
 async function getProducts() {
