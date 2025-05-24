@@ -1,6 +1,6 @@
 // components/SortFilterControls.jsx
 "use client"; // This component MUST be a Client Component
-
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Fragment, useCallback } from 'react';
 import { Listbox, Transition } from '@headlessui/react'; // Import Listbox and Transition
@@ -69,6 +69,7 @@ export default function SortFilterControls() {
 
 
   return (
+    <Suspense fallback={<div>Loading filters...</div>}>
     // Apply your custom font globally here (e.g., font-sans) or ensure it's inherited from layout.jsx
     <div className="mb-6 flex flex-wrap gap-3 items-center font-sans text-sm">
 
@@ -238,5 +239,6 @@ export default function SortFilterControls() {
       </Listbox>
 
     </div>
+    </Suspense>
   );
 }
