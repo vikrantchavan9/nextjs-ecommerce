@@ -8,10 +8,13 @@ export default function ShopPage() {
   const { products, loading } = ShopProducts();
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 text-slate-800">Our Products</h1>
-      <SortFilterControls />
+
+      {/* Wrap SortFilterControls in Suspense */}
+      <Suspense fallback={<div>Loading filters...</div>}>
+        <SortFilterControls />
+      </Suspense>
 
       {loading ? (
         <p className="text-center text-black">Loading products...</p>
@@ -25,6 +28,5 @@ export default function ShopPage() {
         </div>
       )}
     </div>
-    </Suspense>
   );
 }
