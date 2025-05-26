@@ -13,7 +13,7 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="text-gray-700 space-y-4">
               <p>
-                Welcome to MyStore, designed and developed by Vikrant Chavan your premier destination for the latest trends in fashion. Founded with a vision to bring high-quality, stylish, and accessible clothing to everyone, we believe that fashion is more than just clothes – it's a form of self-expression.
+                Welcome to MyStore, designed and developed by Vikrant Madhusudan Chavan your premier destination for the latest trends in fashion. Founded with a vision to bring high-quality, stylish, and accessible clothing to everyone, we believe that fashion is more than just clothes – it's a form of self-expression.
               </p>
               <p>
                 Our journey began with a simple idea: to curate a collection that empowers individuals to feel confident and comfortable in their own skin. We meticulously select each piece, focusing on exceptional craftsmanship, sustainable practices where possible, and designs that resonate with modern sensibilities.
