@@ -45,7 +45,7 @@ const CartPage = () => {
                 />
                 <div className='p-2'>
                   <p className="font-semibold">{item.name}</p>
-                   <p className="text-black">${totalPrice.toFixed(2)}</p>
+                   <p className="text-black">₹{totalPrice.toFixed(2)}</p>
                 <p>Quantity</p>
                 <div className='flex my-2'>
                  <button
@@ -69,7 +69,7 @@ const CartPage = () => {
         })}
       </ul>
       <div className="mt-4 text-right">
-        <h3>Grand Total: ${grandTotal.toFixed(2)}</h3>
+        <h3>Grand Total: ₹{grandTotal.toFixed(2)}</h3>
         <button
           onClick={handleCheckout}
           className="bg-black text-white px-4 py-2 rounded hover:bg-gray-900"
