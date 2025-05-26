@@ -20,8 +20,8 @@ export default function ContactPage() {
       {/* Optional: Add more contact info or a map here */}
       <div className="mt-12 text-center text-gray-700 text-base">
         <p className="font-semibold mb-2">Other Ways to Connect:</p>
-        <p>Email: <a href="mailto:info@yourstore.com" className="text-indigo-600 hover:underline">info@yourstore.com</a></p>
-        <p>Address: 123 Store St, Fashion City, FC 12345</p>
+        <p>Email: <a href="mailto:info@yourstore.com" className="text-indigo-600 hover:underline">vikrantchavan200@gmail.com</a></p>
+        <p>Address: Samarth Empire, Khutwadnagar, Nashik 422009</p>
       </div>
     </div>
   );

@@ -23,7 +23,7 @@ export default function ProductCard({ product }) {
         <div className="p-4">
           <h3 className="text-sm text-black font-medium">{product.name}</h3>
           <p className="text-xs text-black">{product.category}</p>
-          <p className="mt-2 font-semibold text-slate-900">${product.price}</p>
+          <p className="mt-2 font-semibold text-slate-900">₹{product.price}</p>
         </div>
       </div>
     </Link>

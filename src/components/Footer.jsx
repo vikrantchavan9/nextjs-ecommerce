@@ -35,8 +35,8 @@ const Footer = () => {
               Instagram
             </a>
           </div>
-          <p className="mt-2">Email: info@mystore.com</p>
-          <p>Phone: +1 234 567 8900</p>
+          <p className="mt-2">Email: vikrantchavan200@gmail.com</p>
+          <p>Phone: +91 8208280387</p>
         </div>
       </div>
     </footer>

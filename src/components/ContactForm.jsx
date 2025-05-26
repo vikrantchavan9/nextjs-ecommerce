@@ -108,7 +108,7 @@ export default function ContactForm() {
             onChange={handleChange}
             className={`mt-1 block w-full px-4 py-2 border ${
               errors.name ? 'border-red-500' : 'border-gray-300'
-            } rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out`}
+            } rounded-md shadow-sm focus:ring-black focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out`}
             placeholder="Your Name"
           />
           {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
@@ -126,7 +126,7 @@ export default function ContactForm() {
             onChange={handleChange}
             className={`mt-1 block w-full px-4 py-2 border ${
               errors.email ? 'border-red-500' : 'border-gray-300'
-            } rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out`}
+            } rounded-md shadow-sm focus:ring-black focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out`}
             placeholder="you@example.com"
           />
           {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
@@ -173,7 +173,7 @@ export default function ContactForm() {
             type="submit"
             disabled={isSubmitting}
             className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white ${
-              isSubmitting ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+              isSubmitting ? 'bg-black cursor-not-allowed' : 'bg-black hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
             } transition duration-150 ease-in-out`}
           >
             {isSubmitting ? 'Sending...' : 'Send Message'}
