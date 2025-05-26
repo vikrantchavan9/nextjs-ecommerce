@@ -27,7 +27,7 @@ const { id } = params;
       <div className="p-2">
         <h1 className="text-sm mb-8 text-black">⭐⭐⭐⭐☆ (4.2/5 based on 12 reviews)</h1>
         <h1 className="text-2xl text-black font-semibold ">{product.name}</h1>
-        <p className="text-lg font-semibold text-slate-900">${product.price}</p>
+        <p className="text-lg font-semibold text-slate-900">₹{product.price}</p>
         
         <AddToCartButton product={product} />
 
