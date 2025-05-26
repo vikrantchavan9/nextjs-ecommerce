@@ -1,21 +1,39 @@
-// app/cart/page.jsx
 'use client';
 
 import { useCart } from '../context/cart-context';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { useRouter } from 'next/navigation';
 
 const CartPage = () => {
   const { cartItems, removeFromCart, increaseQuantity } = useCart();
+  const [user, setUser] = useState(null);
+  const router = useRouter();
 
-  // Calculate grand total of all items
+  // Fetch authenticated user
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    checkUser();
+  }, []);
+
+  // Calculate grand total
   const grandTotal = cartItems.reduce(
     (sum, item) => sum + Number(item.price) * item.quantity,
     0
   );
 
   const handleCheckout = () => {
-    console.log('Proceeding to checkout with:', cartItems);
+    if (!user) {
+      router.push('/login?redirect=cart'); // Redirect guests to login
+    } else {
+      router.push('/payment'); // Redirect logged-in users to payment
+    }
   };
 
+  // Empty cart UI
   if (cartItems.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -45,24 +63,24 @@ const CartPage = () => {
                 />
                 <div className='p-2'>
                   <p className="font-semibold">{item.name}</p>
-                   <p className="text-black">₹{totalPrice.toFixed(2)}</p>
-                <p>Quantity</p>
-                <div className='flex my-2'>
-                 <button
-                    onClick={() => removeFromCart(item.id)}
-                    className="px-2 py-1 bg-gray-300 rounded hover:bg-gray-400"
-                  >
-                  -
-                  </button>
-                <p className='mx-2'>{item.quantity}</p>
+                  <p className="text-black">₹{totalPrice.toFixed(2)}</p>
+                  <p>Quantity</p>
+                  <div className='flex my-2'>
                     <button
-              onClick={() => increaseQuantity(item.id)}
-              className="px-2 py-1 bg-gray-300 rounded hover:bg-gray-400"
-            >
-              +
-            </button>
-                </div>              
-              </div>
+                      onClick={() => removeFromCart(item.id)}
+                      className="px-2 py-1 bg-gray-300 rounded hover:bg-gray-400"
+                    >
+                      -
+                    </button>
+                    <p className='mx-2'>{item.quantity}</p>
+                    <button
+                      onClick={() => increaseQuantity(item.id)}
+                      className="px-2 py-1 bg-gray-300 rounded hover:bg-gray-400"
+                    >
+                      +
+                    </button>
+                  </div>              
+                </div>
               </div>
             </li>
           );
@@ -74,7 +92,7 @@ const CartPage = () => {
           onClick={handleCheckout}
           className="bg-black text-white px-4 py-2 rounded hover:bg-gray-900"
         >
-          Checkout
+          {user ? 'Proceed to Payment' : 'Login/Register to Checkout'}
         </button>
       </div>
     </div>
