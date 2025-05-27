@@ -53,7 +53,7 @@ const CartPage = () => {
                 />
                 <div className='p-2'>
                   <p className="font-semibold">{item.name}</p>
-                   <p className="text-black">${totalPrice.toFixed(2)}</p>
+                   <p className="text-black">₹{totalPrice.toFixed(2)}</p>
                 <p>Quantity</p>
                 <div className='flex my-2'>
                    <button
@@ -77,7 +77,7 @@ const CartPage = () => {
         })}
       </ul>
       <div className="mt-4 text-right">
-        <h3>Grand Total: ${grandTotal.toFixed(2)}</h3>
+        <h3>Grand Total: ₹{grandTotal.toFixed(2)}</h3>
         {/* Replace the old Checkout button with the RazorpayButton */}
         {/* Ensure amount is an integer for Razorpay (e.g., 500 for INR 5.00) */}
         <RazorpayButton amount={Math.round(grandTotal * 100) / 100} currency={currency} />
