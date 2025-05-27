@@ -11,23 +11,31 @@ const Navbar = () => {
   const [user, setUser] = useState(null);
   const router = useRouter();
 
-  // Check user authentication state
+  // Check user authentication state + Listen for changes
   useEffect(() => {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
     };
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+        checkUser(); // 🛠️ Update user state when login/logout happens
+      }
+    });
+
     checkUser();
+    return () => authListener?.subscription.unsubscribe();
   }, []);
 
-  // Handle login/logout
+  // Handle login/logout with page refresh
   const handleAuthAction = async () => {
     if (user) {
       await supabase.auth.signOut();
       setUser(null);
-      router.refresh(); // Refresh navbar state
+      router.refresh(); // 🔄 Forces page re-render after logout
     } else {
-      router.push('/login'); // Redirect guests to login
+      router.push('/login');
     }
   };
 
@@ -76,15 +84,84 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Mobile Menu Button */}
+{/* Mobile Menu Button */}
         <div className="md:hidden">
           <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-white focus:outline-none">
-            <svg className="h-6 w-6" viewBox="0 0 24 24">
-              <path d="M4 6h16M4 12h16m-7 6h7"></path>
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
             </svg>
           </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-gray-700 mt-2 p-4">
+          <Link href="/" className="block py-2 hover:bg-gray-600 rounded">
+            Home
+          </Link>
+          <Link href="/shop" className="block py-2 hover:bg-gray-600 rounded">
+            Explore
+          </Link>
+          <div className="py-2">
+            <button
+              onClick={() => setIsSectionsDropdownOpen(!isSectionsDropdownOpen)}
+              className="w-full text-left py-2 hover:bg-gray-600 rounded flex items-center justify-between"
+            >
+              Sections
+              <svg
+                className={`h-4 w-4 transform transition-transform duration-200 ${
+                  isSectionsDropdownOpen ? 'rotate-180' : ''
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            {isSectionsDropdownOpen && (
+              <div className="pl-4 mt-2">
+                <Link href="/shop?section=men" className="block py-2 hover:bg-gray-600 rounded">
+                  Men
+                </Link>
+                <Link href="/shop?section=women" className="block py-2 hover:bg-gray-600 rounded">
+                  Women
+                </Link>
+                <Link href="/shop?section=kids" className="block py-2 hover:bg-gray-600 rounded">
+                  Kids
+                </Link>
+                <Link href="/shop?section=unisex" className="block py-2 hover:bg-gray-600 rounded">
+                  Unisex
+                </Link>
+              </div>
+            )}
+          </div>
+          <Link href="/cart" className="block py-2 hover:bg-gray-600 rounded">
+            Cart
+          </Link>
+          <Link href="/order" className="block py-2 hover:bg-gray-600 rounded">
+            Your Orders
+          </Link>
+          <Link href="/about" className="block py-2 hover:bg-gray-600 rounded">
+            About
+          </Link>
+          <Link href="/contact" className="block py-2 hover:bg-gray-600 rounded">
+            Contact
+          </Link>
+                    {/* Login/Logout Button */}
+          <button onClick={handleAuthAction} className="bg-gray-700 text-white py-2 rounded hover:bg-gray-600">
+            {user ? 'Logout' : 'Login'}
+          </button>
+        </div>
+      )}
     </nav>
   );
 };
