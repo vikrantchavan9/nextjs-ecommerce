@@ -4,12 +4,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
-import { useRouter } from 'next/router';
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectPath = searchParams.get('redirect') || '/'; // Default to homepage
+  const redirectPath = searchParams.get('redirect') || '/';
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -23,7 +22,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push(redirectPath); // Redirect based on initial request
+      router.push(redirectPath);
     }
   }, [isAuthenticated]);
 
