@@ -80,12 +80,8 @@ const CartPage = () => {
         <h3>Grand Total: ₹{grandTotal.toFixed(2)}</h3>
         {/* Replace the old Checkout button with the RazorpayButton */}
         {/* Ensure amount is an integer for Razorpay (e.g., 500 for INR 5.00) */}
-        <RazorpayButton
-  amount={Math.round(grandTotal * 100) / 100}
-  currency={currency}
-  cartItems={cartItems}
-  orderIdPrefix="order_receipt_"
-/>
+<RazorpayButton cartItems={cartItems} totalAmount={grandTotal} />
+
 
         {/* You can still have a regular checkout button if Razorpay is optional or for other payment methods */}
         {/* <button

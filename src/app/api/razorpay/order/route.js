@@ -1,37 +1,25 @@
-// app/api/razorpay/verify/route.js
 import { NextResponse } from 'next/server';
-import crypto from 'crypto';
+import Razorpay from 'razorpay';
 
-export async function POST(request) {
+export async function POST(req) {
+     const { cartItems, totalAmount } = await req.json();
+     console.log("cart items:", cartItems);
+
+     const razorpay = new Razorpay({
+          key_id: process.env.RAZORPAY_KEY_ID,
+          key_secret: process.env.RAZORPAY_KEY_SECRET,
+     });
+
+     const options = {
+          amount: Number(totalAmount * 100), // amount in paise
+          currency: 'INR',
+          receipt: `receipt_order_${Math.random() * 10000}`,
+     };
+
      try {
-          const body = await request.json();
-          const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
-
-          if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-               return NextResponse.json(
-                    { message: 'Missing required payment verification fields.' },
-                    { status: 400 }
-               );
-          }
-
-          const generated_signature = crypto
-               .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-               .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-               .digest('hex');
-
-          const isValid = generated_signature === razorpay_signature;
-
-          if (isValid) {
-               // Optionally: log, save to DB, etc.
-               return NextResponse.json({ verified: true }, { status: 200 });
-          } else {
-               return NextResponse.json({ verified: false, message: 'Invalid signature.' }, { status: 400 });
-          }
-     } catch (error) {
-          console.error('Payment verification failed:', error);
-          return NextResponse.json(
-               { message: 'Internal server error.', error: error.message },
-               { status: 500 }
-          );
+          const order = await razorpay.orders.create(options);
+          return NextResponse.json({ success: true, order });
+     } catch (err) {
+          return NextResponse.json({ success: false, error: err.message }, { status: 500 });
      }
 }

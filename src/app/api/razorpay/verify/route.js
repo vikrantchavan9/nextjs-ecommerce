@@ -1,60 +1,52 @@
-// app/api/razorpay/verify/route.js
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
 import crypto from 'crypto';
+import { createClient } from '@supabase/supabase-js';
 
-export async function POST(request) {
-     try {
-          const body = await request.json();
+const supabase = createClient(
+     process.env.NEXT_PUBLIC_SUPABASE_URL,
+     process.env.SUPABASE_SERVICE_ROLE_KEY // use service key for insert ops
+);
 
-          const {
-               razorpay_payment_id,
+export async function POST(req) {
+     const body = await req.json();
+     const {
+          razorpay_order_id,
+          razorpay_payment_id,
+          razorpay_signature,
+          cartItems,
+          totalAmount,
+     } = body;
+
+     const sign = razorpay_order_id + '|' + razorpay_payment_id;
+     const expectedSignature = crypto
+          .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+          .update(sign.toString())
+          .digest('hex');
+
+     const isAuthentic = expectedSignature === razorpay_signature;
+
+     if (!isAuthentic) {
+          return NextResponse.json({ success: false, error: 'Invalid signature' }, { status: 400 });
+     }
+
+     const { data: { user } } = await supabase.auth.getUser();
+
+     const { data, error } = await supabase.from('orders').insert([
+          {
+               user_id: user?.id || null,
+               total_amount: totalAmount,
+               currency: 'INR',
+               status: 'paid',
+               payment_id: razorpay_payment_id,
                razorpay_order_id,
                razorpay_signature,
-               items = [],
-               total_amount,
-               currency = 'INR',
-               user_id = null
-          } = body;
+               items: cartItems,
+          },
+     ]);
 
-          if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
-               return NextResponse.json({ success: false, message: 'Missing payment details' }, { status: 400 });
-          }
-
-          // Verify the signature
-          const generatedSignature = crypto
-               .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-               .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-               .digest('hex');
-
-          if (generatedSignature !== razorpay_signature) {
-               return NextResponse.json({ success: false, message: 'Invalid signature' }, { status: 400 });
-          }
-
-          // Insert order into Supabase
-          const { data, error } = await supabase.from('orders').insert([
-               {
-                    user_id,
-                    total_amount,
-                    currency,
-                    status: 'paid',
-                    payment_id: razorpay_payment_id,
-                    razorpay_order_id,
-                    razorpay_signature,
-                    items,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-               }
-          ]);
-
-          if (error) {
-               console.error('Error inserting order:', error);
-               return NextResponse.json({ success: false, message: 'Database error' }, { status: 500 });
-          }
-
-          return NextResponse.json({ success: true, message: 'Payment verified and order saved', data });
-     } catch (err) {
-          console.error('Error verifying payment:', err);
-          return NextResponse.json({ success: false, message: 'Internal server error' }, { status: 500 });
+     if (error) {
+          return NextResponse.json({ success: false, error: error.message }, { status: 500 });
      }
+
+     return NextResponse.json({ success: true });
 }
