@@ -1,10 +1,11 @@
-// --- RazorpayButton.jsx (Client Component)
+// components/RazorpayButton.jsx
 "use client";
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function RazorpayButton({ amount, currency = 'INR', cartItems, orderIdPrefix = 'order_receipt_' }) {
+export default function RazorpayButton({ amount = 1000, currency = "INR", cartItems = [], orderIdPrefix = 'order_receipt_' }) {
+  const [loading, setLoading] = useState(true);
   const [sdkLoaded, setSdkLoaded] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [message, setMessage] = useState('');
@@ -13,83 +14,149 @@ export default function RazorpayButton({ amount, currency = 'INR', cartItems, or
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.onload = () => setSdkLoaded(true);
-    script.onerror = () => setMessage('Failed to load Razorpay SDK.');
+    script.onload = () => {
+      setSdkLoaded(true);
+      setLoading(false);
+    };
+    script.onerror = () => {
+      setMessage('Failed to load Razorpay SDK.');
+      setLoading(false);
+      setSdkLoaded(false);
+    };
     document.body.appendChild(script);
-    return () => { if (document.body.contains(script)) document.body.removeChild(script); };
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
   }, []);
 
   const handlePayment = async () => {
-    if (!window.Razorpay || !sdkLoaded) {
-      setMessage('Razorpay SDK not loaded yet.');
+    if (!window.Razorpay) {
+      setMessage('Razorpay SDK not loaded.');
+      setPaymentStatus('failed');
       return;
     }
 
+    setPaymentStatus('pending');
+    setMessage('Initiating payment...');
+
     try {
-      const orderRes = await fetch('/api/razorpay/order', {
+      const receiptId = orderIdPrefix + Date.now();
+
+      const orderResponse = await fetch('/api/razorpay/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: parseFloat(amount),
-          currency,
-          receipt: orderIdPrefix + Date.now(),
+          amount: amount,
+          currency: currency,
+          receipt: receiptId,
         }),
       });
 
-      const orderData = await orderRes.json();
-      if (!orderRes.ok) throw new Error(orderData.message || 'Order creation failed');
+      const orderData = await orderResponse.json();
+
+      if (!orderResponse.ok) {
+        console.error("Order creation failed:", orderData);
+        setMessage(orderData.message || 'Failed to create order.');
+        setPaymentStatus('failed');
+        return;
+      }
 
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.amount,
         currency: orderData.currency,
-        name: 'Your Store',
-        description: 'Order Payment',
+        name: 'Your Store Name',
+        description: 'Product Purchase',
         order_id: orderData.id,
-        handler: async (response) => {
+        handler: async function (response) {
+          setMessage('Verifying payment...');
+          setPaymentStatus('pending');
+
           try {
-            const verifyRes = await fetch('/api/razorpay/verify', {
+            const verifyResponse = await fetch('/api/razorpay/verify', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 ...response,
-                cartItems,
-                totalAmount: parseFloat(amount),
+                cartItems: cartItems,
+                totalAmount: amount,
+                currency: currency
               }),
             });
-            const data = await verifyRes.json();
-            if (verifyRes.ok) {
+
+            const verifyData = await verifyResponse.json();
+
+            if (verifyResponse.ok) {
+              setPaymentStatus('success');
+              setMessage(verifyData.message || 'Payment successful!');
               router.push('/orders?status=success&orderId=' + response.razorpay_order_id);
             } else {
-              throw new Error(data.message);
+              setPaymentStatus('failed');
+              setMessage(verifyData.message || 'Payment verification failed.');
             }
-          } catch (err) {
-            console.error('Verification failed:', err);
-            setMessage('Payment verification failed.');
+          } catch (error) {
+            console.error('Verification error:', error);
+            setPaymentStatus('failed');
+            setMessage('Payment verification failed due to network error.');
           }
         },
-        theme: { color: '#3399CC' },
+        prefill: {
+          name: 'Customer Name',
+          email: 'customer@example.com',
+          contact: '9999999999',
+        },
+        notes: {
+          address: 'Customer Address Details',
+        },
+        theme: {
+          color: '#3399CC',
+        },
       };
 
-      const rzp = new window.Razorpay(options);
-      rzp.on('payment.failed', (response) => {
-        console.error('Payment failed:', response.error);
+      const rzp1 = new window.Razorpay(options);
+      rzp1.on('payment.failed', function (response) {
+        setPaymentStatus('failed');
+        setMessage(response.error.description || 'Payment failed.');
         router.push('/orders?status=failed');
       });
-
-      rzp.open();
-    } catch (err) {
-      console.error(err);
-      setMessage(err.message || 'Payment initiation failed');
+      rzp1.open();
+    } catch (error) {
+      console.error('Payment error:', error);
+      setPaymentStatus('failed');
+      setMessage('Error initiating payment.');
     }
   };
 
   return (
-    <div className="flex flex-col items-center">
-      <button onClick={handlePayment} disabled={!sdkLoaded} className="bg-blue-600 text-white px-4 py-2 rounded-md">
-        Pay ₹{amount}
+    <div className="flex flex-col items-center justify-center p-4">
+      <button
+        onClick={handlePayment}
+        disabled={!sdkLoaded || paymentStatus === 'pending'}
+        className={`py-3 px-8 rounded-md text-lg font-semibold text-white transition-all duration-300
+          ${!sdkLoaded || paymentStatus === 'pending'
+            ? 'bg-gray-400 cursor-not-allowed'
+            : 'bg-indigo-600 hover:bg-indigo-700'}
+          shadow-md hover:shadow-lg`}
+      >
+        {!sdkLoaded
+          ? 'Loading Payment...'
+          : paymentStatus === 'pending'
+          ? 'Processing...'
+          : `Pay ${currency} ${amount}`}
       </button>
-      {message && <p className="mt-2 text-red-600">{message}</p>}
+
+      {message && (
+        <div
+          className={`mt-4 p-3 rounded-md text-center w-full max-w-sm
+          ${paymentStatus === 'success' ? 'bg-green-100 text-green-700' :
+            paymentStatus === 'failed' ? 'bg-red-100 text-red-700' :
+            'bg-blue-100 text-blue-700'}`}
+        >
+          {message}
+        </div>
+      )}
     </div>
   );
 }
