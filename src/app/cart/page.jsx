@@ -13,13 +13,6 @@ const CartPage = () => {
     0
   );
 
-  // You can keep this handleCheckout for other non-payment checkout logic if needed,
-  // but the payment initiation will now be handled by RazorpayButton.
-  const handleCheckout = () => {
-    console.log('Proceeding to checkout with:', cartItems);
-    // Any other pre-payment checkout logic can go here
-  };
-
   if (cartItems.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -30,8 +23,7 @@ const CartPage = () => {
   }
 
   // Determine the currency. For Razorpay, 'INR' is a common choice.
-  // You might want to make this dynamic based on user's region or store settings.
-  const currency = 'INR'; 
+  const currency = 'INR';
 
   return (
     <div className="text-black container mx-auto px-3 py-8">
@@ -69,27 +61,31 @@ const CartPage = () => {
                 >
                   +
                 </button>
-                </div>          
+                </div>
               </div>
+              </div>
+              {/* Add a remove button for each item for full functionality */}
+              <div>
+                <button
+                  onClick={() => removeFromCart(item.id)}
+                  className="text-red-500 hover:text-red-700 text-sm"
+                >
+                  Remove
+                </button>
               </div>
             </li>
           );
         })}
       </ul>
       <div className="mt-4 text-right">
-        <h3>Grand Total: ₹{grandTotal.toFixed(2)}</h3>
-        {/* Replace the old Checkout button with the RazorpayButton */}
-        {/* Ensure amount is an integer for Razorpay (e.g., 500 for INR 5.00) */}
-<RazorpayButton cartItems={cartItems} totalAmount={grandTotal} />
+        <h3 className="font-bold text-xl">Grand Total: ₹{grandTotal.toFixed(2)}</h3>
 
-
-        {/* You can still have a regular checkout button if Razorpay is optional or for other payment methods */}
-        {/* <button
-          onClick={handleCheckout}
-          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-900 ml-2"
-        >
-          Regular Checkout
-        </button> */}
+        {/* Pass cart details to RazorpayButton */}
+        <RazorpayButton
+          amount={grandTotal}
+          currency={currency}
+          cartItems={cartItems} // Pass the entire cart items array
+        />
       </div>
     </div>
   );
