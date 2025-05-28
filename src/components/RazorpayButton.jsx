@@ -4,27 +4,28 @@
 import { useState } from 'react';
 import Script from 'next/script';
 import { useRouter } from 'next/navigation';
-import { useCart } from '@/app/context/cart-context'; // Import your cart context
 
-export default function RazorpayButton({ amount, currency, cartItems }) {
+export default function RazorpayButton({ product }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { clearCart } = useCart(); // Get clearCart from your context
+
+  // Load Razorpay's checkout.js script once per component instance
+  // or ideally in your root layout for broader availability
+  // (though placing it here is okay if this button is often present)
 
   const handlePayment = async () => {
     setLoading(true);
 
     try {
-      // 1. Create order on your backend
-      const orderResponse = await fetch('/api/order', { // Changed to /api/order
+      // 1. Create order on your backend (Razorpay specific order)
+      const orderResponse = await fetch('/api/razorpay/create-order', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: amount,
-          currency: currency,
-          cartItems: cartItems, // Send cart items to the server
+          amount: product.price,
+          currency: 'INR',
+          receiptId: `receipt_${product.id}_${Date.now()}`,
+          notes: { productId: product.id, productName: product.name },
         }),
       });
 
@@ -33,74 +34,89 @@ export default function RazorpayButton({ amount, currency, cartItems }) {
         throw new Error(errorData.message || 'Failed to create Razorpay order');
       }
 
-      const { orderId, amount: razorpayAmount, currency: razorpayCurrency } = await orderResponse.json();
+      const { orderId, amount, currency } = await orderResponse.json(); // This is Razorpay's orderId (order_xxxx)
 
-      if (typeof window.Razorpay === 'undefined') {
-        console.error("Razorpay SDK not loaded. Please ensure the script is loaded.");
-        alert("Payment gateway not ready. Please try again.");
-        setLoading(false);
-        return;
-      }
-
-      // 3. Configure Razorpay options
+      // 2. Configure and open Razorpay Checkout
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: razorpayAmount, // Amount from your order API (in paise)
-        currency: razorpayCurrency,
-        name: "Your Ecommerce Store",
-        description: "Order Payment",
+        amount: amount,
+        currency: currency,
+        name: "Your Store Name",
+        description: `Payment for ${product.name}`,
         order_id: orderId,
         handler: async function (response) {
-          // This function is called after successful payment
-          console.log("Razorpay callback received:", response);
+          // This handler is called on successful payment from Razorpay's end
+          console.log("Razorpay handler response:", response);
 
-          // 4. Verify payment and save order on your backend
-          const verifyResponse = await fetch('/api/verify', { // Changed to /api/verify
+          // 3. Verify payment on your backend (CRUCIAL SECURITY STEP)
+          const verifyResponse = await fetch('/api/razorpay/verify-payment', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              ...response, // Pass all Razorpay response data
-              cartItems: cartItems, // Pass the original cart items again
-              totalAmount: amount, // Pass the total amount again
-              currency: currency,
-            }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(response), // Pass all response data for verification
           });
 
-          if (verifyResponse.ok) {
-            const result = await verifyResponse.json();
-            if (result.success) {
-              alert('Payment successful!');
-              clearCart(); // Clear the cart after successful order
-              router.push(`/order-success?orderId=${result.order.id}`); // Redirect to a success page
-            } else {
-              alert(result.message || 'Payment verification failed. Please contact support.');
-              console.error('Payment verification failed:', result.message);
+          if (!verifyResponse.ok) {
+            const errorData = await verifyResponse.json();
+            alert(`Payment verification failed: ${errorData.message || 'Server error'}`);
+            console.error('Payment verification failed - Server Error:', errorData);
+            setLoading(false); // Make sure loading is reset here
+            return;
+          }
+
+          const verificationResult = await verifyResponse.json();
+
+          if (verificationResult.success) {
+            console.log('Payment verified successfully on server!');
+
+            // 4. Create the final order in your Supabase DB using your new API route
+            // Send Razorpay's details along with cart items
+            const createOrderInDbResponse = await fetch('/api/order', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                cartItems: [{
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  quantity: 1 // Assuming 1 quantity for a direct product page purchase
+                }],
+                userId: null, // Replace with actual user ID if logged in
+                totalAmount: product.price,
+                paymentId: response.razorpay_payment_id, // The ID from Razorpay's successful payment
+                razorpayOrderId: response.razorpay_order_id, // The order ID from Razorpay
+              }),
+            });
+
+            if (!createOrderInDbResponse.ok) {
+              const errorData = await createOrderInDbResponse.json();
+              alert(`Failed to save order: ${errorData.message || 'Server error'}`);
+              console.error('Error saving order to DB:', errorData);
+              setLoading(false); // Make sure loading is reset here
+              return;
             }
+
+            const dbOrderResult = await createOrderInDbResponse.json();
+            console.log('Order successfully saved to DB:', dbOrderResult);
+
+            alert('Payment successful and order saved!');
+            router.push(`/order-success?orderId=${dbOrderResult.orderId}&paymentId=${response.razorpay_payment_id}`);
+
           } else {
-            const errorResult = await verifyResponse.json();
-            alert(`Payment verification failed due to server error: ${errorResult.message || 'Unknown error'}`);
-            console.error('Server error during verification:', errorResult);
+            alert('Payment verification failed. Please contact support.');
+            console.error('Payment verification failed:', verificationResult.message);
           }
         },
-        prefill: {
-          // Optional: Prefill user details if available
-          // name: "Customer Name", // You might fetch this from Supabase in Client Component
-          // email: "customer@example.com",
-          // contact: "9999999999",
-        },
-        theme: {
-          color: "#3399CC",
-        },
+        prefill: { /* ... your prefill data ... */ },
+        notes: { /* ... your notes ... */ },
+        theme: { color: "#3399CC" },
       };
 
       const rzp1 = new window.Razorpay(options);
 
       rzp1.on('payment.failed', function (response) {
-        alert(`Payment Failed: ${response.error.description || 'Unknown error'}`);
-        console.error('Payment failed:', response.error);
-        // You might want to log this failure on your server too via another API route
+        alert(response.error.description || 'Payment Failed');
+        console.error('Razorpay Payment Failed:', response.error);
+        setLoading(false); // Reset loading on failure
       });
 
       rzp1.open();
@@ -109,7 +125,10 @@ export default function RazorpayButton({ amount, currency, cartItems }) {
       console.error('Payment initiation error:', error);
       alert(error.message || 'Payment failed to initiate. Please try again.');
     } finally {
-      setLoading(false);
+      // setLoading(false); // Handled within handler/failure now.
+      // This finally block will run immediately after rzp1.open(),
+      // but before the handler is called, so it's often better to
+      // manage loading inside the handler or failure callbacks.
     }
   };
 
@@ -120,13 +139,12 @@ export default function RazorpayButton({ amount, currency, cartItems }) {
         src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="afterInteractive"
       />
-
       <button
         onClick={handlePayment}
-        disabled={loading || amount <= 0} // Disable if loading or amount is 0
-        className="mt-6 px-6 py-3 bg-black text-white rounded hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={loading}
+        className="mt-6 px-6 py-3 bg-black text-white rounded hover:bg-slate-800 transition"
       >
-        {loading ? 'Processing...' : `Pay Now (₹${amount.toFixed(2)})`}
+        {loading ? 'Processing...' : `Pay Now (₹${product.price})`}
       </button>
     </>
   );

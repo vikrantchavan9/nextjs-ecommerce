@@ -85,8 +85,8 @@ const Navbar = () => {
           <Link href="/cart" className="hover:text-gray-300">
             Cart
           </Link>
-          <Link href="/collections" className="hover:text-gray-300">
-            Collections
+          <Link href="/shop" className="hover:text-gray-300">
+            Browse Products
           </Link>
           <Link href="/about" className="hover:text-gray-300">
             About
