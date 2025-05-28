@@ -1,6 +1,6 @@
 // app/api/razorpay/verify/route.js
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase-server';
+import { supabase } from '@/lib/supabase';
 import crypto from 'crypto';
 
 export async function POST(request) {
