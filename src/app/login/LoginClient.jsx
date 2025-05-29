@@ -43,10 +43,6 @@ export default function LoginClient() {
           providers={['google']}
           redirectTo={typeof window !== 'undefined' ? window.location.origin : ''}
         />
-        <p className="text-sm text-center mt-4 text-gray-600">
-          Don’t have an account?{' '}
-          <a href="/register" className="text-blue-600 hover:underline">Register</a>
-        </p>
       </div>
     </div>
   );

@@ -148,16 +148,16 @@ const Navbar = () => {
             </button>
             {isSectionsDropdownOpen && (
               <div className="pl-4 mt-2">
-                <Link href="/products?section=men" className="block py-2 hover:bg-gray-600 rounded">
+                <Link href="/shop?section=men" className="block py-2 hover:bg-gray-600 rounded">
                   Men
                 </Link>
-                <Link href="/products?section=women" className="block py-2 hover:bg-gray-600 rounded">
+                <Link href="/shop?section=women" className="block py-2 hover:bg-gray-600 rounded">
                   Women
                 </Link>
-                <Link href="/products?section=kids" className="block py-2 hover:bg-gray-600 rounded">
+                <Link href="/shop?section=kids" className="block py-2 hover:bg-gray-600 rounded">
                   Kids
                 </Link>
-                <Link href="/products?section=unisex" className="block py-2 hover:bg-gray-600 rounded">
+                <Link href="/shop?section=unisex" className="block py-2 hover:bg-gray-600 rounded">
                   Unisex
                 </Link>
               </div>
