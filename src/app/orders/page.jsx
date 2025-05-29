@@ -1,24 +1,27 @@
+// src/app/orders/page.jsx
 'use client';
+
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
-  const router = useRouter();
+  const [error, setError] = useState(null);
+  const supabase = createClientComponentClient();
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchOrders = async () => {
+      setLoading(true);
+      setError(null);
       const { data: { user } } = await supabase.auth.getUser();
+
       if (!user) {
-        router.push('/login?redirect=orders'); // Redirect guests to login
+        setError('Please log in to view your orders.');
+        setLoading(false);
         return;
       }
-      setUser(user);
-      
-      // Fetch user-specific orders
+
       const { data, error } = await supabase
         .from('orders')
         .select('*')
@@ -26,32 +29,67 @@ export default function OrdersPage() {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching orders:', error.message);
+        console.error('Error fetching orders:', error);
+        setError('Failed to load orders. Please try again.');
       } else {
-        setOrders(data || []);
+        setOrders(data);
       }
-
       setLoading(false);
     };
 
-    fetchUser();
+    fetchOrders();
   }, []);
 
-  if (loading) return <p>Loading orders...</p>;
-  if (orders.length === 0) return <p className='text-black'>No orders found.</p>;
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-black">
+        <h1 className="text-2xl font-bold mb-4">Your Orders</h1>
+        <p>Loading orders...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-black">
+        <h1 className="text-2xl font-bold mb-4">Your Orders</h1>
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
+
+  if (orders.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-black">
+        <h1 className="text-2xl font-bold mb-4">Your Orders</h1>
+        <p>You haven't placed any orders yet.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 text-black">
       <h1 className="text-2xl font-bold mb-4">Your Orders</h1>
-      <ul>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {orders.map((order) => (
-          <li key={order.id} className="border-b py-4">
-            <p>Order ID: {order.id}</p>
-            <p>Total: ₹{order.total_price}</p>
-            <p>Date: {new Date(order.created_at).toLocaleDateString()}</p>
-          </li>
+          <div key={order.id} className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-2">Order ID: {order.razorpay_order_id}</h2>
+            <p className="text-gray-700">Total: ₹{parseFloat(order.total_amount).toFixed(2)}</p>
+            <p className="text-gray-700">Status: <span className={`font-medium ${order.status === 'completed' ? 'text-green-600' : 'text-yellow-600'}`}>{order.status}</span></p>
+            <p className="text-gray-700 text-sm">Date: {new Date(order.created_at).toLocaleDateString()}</p>
+            <div className="mt-4">
+              <h3 className="font-semibold mb-1">Items:</h3>
+              <ul className="list-disc list-inside">
+                {order.items && order.items.map((item, index) => (
+                  <li key={index} className="text-gray-600 text-sm">
+                    {item.name} x {item.quantity} (₹{item.price})
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

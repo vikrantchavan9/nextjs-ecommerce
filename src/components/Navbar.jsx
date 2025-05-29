@@ -166,7 +166,7 @@ const Navbar = () => {
           <Link href="/cart" className="block py-2 hover:bg-gray-600 rounded">
             My Cart
           </Link>
-           <Link href="/order" className="block py-2 hover:bg-gray-600 rounded">
+           <Link href="/orders" className="block py-2 hover:bg-gray-600 rounded">
             My Orders
           </Link>           
 
