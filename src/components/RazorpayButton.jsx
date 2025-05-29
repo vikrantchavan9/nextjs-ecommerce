@@ -86,7 +86,7 @@ const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
           if (verifyResponse.ok) {
             console.log('Payment verification successful! Attempting redirect...'); // Log this
             // clearCart();
-            // router.push('/payment-success');
+            router.push('/payment-success');
             console.log('Redirect initiated to /payment-success.'); // This might not show if redirect happens fast
           } else {
             const errorVerifyData = await verifyResponse.json();
