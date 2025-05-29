@@ -1,86 +1,81 @@
 // app/api/razorpay/verify/route.js
 import { NextResponse } from 'next/server';
-import crypto from 'crypto';
+import Razorpay from 'razorpay';
+import crypto from 'crypto'; // Node.js built-in module for crypto operations
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
-export async function POST(req) {
-     const supabase = createRouteHandlerClient({ cookies });
+// Initialize Razorpay client (ensure key_secret is loaded)
+const razorpay = new Razorpay({
+     key_id: process.env.RAZORPAY_KEY_ID,
+     key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
+export async function POST(req) {
      try {
           const {
-               razorpay_order_id,
                razorpay_payment_id,
+               razorpay_order_id,
                razorpay_signature,
-               totalAmount, // This is the grandTotal from your cart
-               currency,
-               cartItems,
+               userId, // Passed from frontend for security check
           } = await req.json();
 
-          if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !cartItems || !totalAmount || !currency) {
-               return NextResponse.json({ error: 'Missing required payment verification data' }, { status: 400 });
+          // Validate input
+          if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature || !userId) {
+               return NextResponse.json({ error: 'Missing payment verification data.' }, { status: 400 });
           }
 
-          const body = razorpay_order_id + '|' + razorpay_payment_id;
+          // --- Security Check: Verify User ID using Supabase on the server ---
+          const supabase = createRouteHandlerClient({ cookies });
+          const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-          const expectedSignature = crypto
-               .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-               .update(body.toString())
-               .digest('hex');
-
-          const isAuthentic = expectedSignature === razorpay_signature;
-
-          if (isAuthentic) {
-               // Payment is authentic, now get user and save order to Supabase
-               const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-               if (authError || !user) {
-                    console.error('Supabase auth error:', authError);
-                    return NextResponse.json({ error: 'User not authenticated or session error. Please log in again.' }, { status: 401 });
-               }
-
-               // Prepare items for Supabase (ensure it's a valid JSON structure)
-               const orderItems = cartItems.map(item => ({
-                    id: item.id,
-                    name: item.name,
-                    price: Number(item.price),
-                    quantity: item.quantity,
-                    image: item.images?.[0] || null, // Storing the first image
-               }));
-
-
-               const { data: orderData, error: dbError } = await supabase
-                    .from('orders')
-                    .insert([
-                         {
-                              user_id: user.id,
-                              total_amount: parseFloat(totalAmount).toFixed(2),
-                              currency: currency,
-                              status: 'successful', // Or 'paid', 'completed'
-                              payment_id: razorpay_payment_id,
-                              razorpay_order_id: razorpay_order_id,
-                              razorpay_signature: razorpay_signature,
-                              items: orderItems, // Store the structured cart items
-                         },
-                    ])
-                    .select() // Optionally select the inserted data to return or use
-                    .single(); // Assuming you expect one row back
-
-               if (dbError) {
-                    console.error('Supabase DB error:', dbError);
-                    return NextResponse.json({ error: 'Failed to save order to database.', details: dbError.message }, { status: 500 });
-               }
-
-               return NextResponse.json({ success: true, message: 'Payment verified and order saved.', orderId: orderData?.id }, { status: 200 });
-
-          } else {
-               return NextResponse.json({ success: false, error: 'Invalid payment signature.' }, { status: 400 });
+          if (authError || !user || user.id !== userId) {
+               console.error('Authentication Error during verification:', authError?.message || 'Unauthorized user ID mismatch.');
+               return NextResponse.json({ error: 'Unauthorized or invalid user ID for verification.' }, { status: 401 });
           }
+          // --- End Security Check ---
+
+          // 1. Verify the payment signature
+          const shasum = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
+          shasum.update(`${razorpay_order_id}|${razorpay_payment_id}`);
+          const digest = shasum.digest('hex');
+
+          if (digest !== razorpay_signature) {
+               console.error('Signature mismatch: Invalid payment signature.'); // Debugging
+               return NextResponse.json({ error: 'Invalid payment signature.' }, { status: 400 });
+          }
+
+          console.log('Payment Signature Verified Successfully.'); // Debugging
+
+          // 2. Update the order in Supabase
+          const { data, error: dbError } = await supabase
+               .from('orders')
+               .update({
+                    status: 'completed',
+                    payment_id: razorpay_payment_id,
+                    razorpay_signature: razorpay_signature,
+                    updated_at: new Date().toISOString(), // Update timestamp
+               })
+               .eq('razorpay_order_id', razorpay_order_id)
+               .eq('user_id', userId) // Important: ensure order belongs to the user
+               .select();
+
+          if (dbError) {
+               console.error('Error updating order status in Supabase:', dbError); // Debugging
+               return NextResponse.json({ error: 'Failed to update order status in database.' }, { status: 500 });
+          }
+
+          if (!data || data.length === 0) {
+               console.error('Order not found or not updated for Razorpay Order ID:', razorpay_order_id); // Debugging
+               return NextResponse.json({ error: 'Order not found or already processed.' }, { status: 404 });
+          }
+
+          console.log('Order status updated in Supabase:', data); // Debugging
+
+          return NextResponse.json({ message: 'Payment successful and order updated.' });
+
      } catch (error) {
-          console.error('Razorpay verification API error:', error);
-          return NextResponse.json(
-               { success: false, error: 'Internal Server Error', details: error.message },
-               { status: 500 }
-          );
+          console.error('Error during payment verification:', error); // Debugging
+          return NextResponse.json({ error: error.message }, { status: 500 });
      }
 }
