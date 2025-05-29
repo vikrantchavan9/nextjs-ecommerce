@@ -3,13 +3,13 @@
 
 import { loadRazorpayScript } from '@/lib/utils';
 import { useState } from 'react';
-import { useCart } from '@/app/context/cart-context';
-import { useRouter } from 'next/navigation'; // Import useRouter
+import { useCart } from '../context/cart-context';
+import { useRouter } from 'next/navigation';
 
 const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
   const [loading, setLoading] = useState(false);
   const { clearCart } = useCart();
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter();
 
   const displayRazorpay = async () => {
     setLoading(true);
@@ -60,7 +60,6 @@ const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
           console.log('  response.razorpay_order_id:', response.razorpay_order_id);
           console.log('  response.razorpay_signature:', response.razorpay_signature);
 
-          // Check if key payment IDs are present before proceeding
           if (!response.razorpay_payment_id || !response.razorpay_signature) {
               console.error('Handler received incomplete payment data. Payment likely failed or was incomplete.');
               alert('Payment failed or was incomplete. Please try again.');
@@ -79,19 +78,25 @@ const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
             }),
           });
 
+          // --- ADD THESE NEW LOGS FOR VERIFICATION RESPONSE ---
+          console.log('Verify API response status:', verifyResponse.status);
+          console.log('Verify API response ok:', verifyResponse.ok);
+          // --- END NEW LOGS ---
+
           if (verifyResponse.ok) {
-            // alert('Payment Successful!'); // Remove alert
-            clearCart(); // Clear cart after successful payment
-            router.push('/payment-success'); // Redirect to success page
+            console.log('Payment verification successful! Attempting redirect...'); // Log this
+            clearCart();
+            router.push('/payment-success');
+            console.log('Redirect initiated to /payment-success.'); // This might not show if redirect happens fast
           } else {
             const errorVerifyData = await verifyResponse.json();
             alert(`Payment Verification Failed: ${errorVerifyData.error}`);
             console.error('Payment Verification Error:', errorVerifyData);
+            console.log('Payment verification failed. No redirect.'); // Log this too
           }
           setLoading(false);
         },
         prefill: {
-          // You might want to prefill user details here if available from your user session
           // name: 'John Doe',
           // email: 'john.doe@example.com',
           // contact: '9999999999',
