@@ -3,7 +3,7 @@
 
 import { loadRazorpayScript } from '@/lib/utils';
 import { useState } from 'react';
-import { useCart } from '../context/cart-context';
+import { useCart } from '@/app/context/cart-context';
 import { useRouter } from 'next/navigation';
 
 const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
