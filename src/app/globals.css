@@ -6,6 +6,8 @@
 }
 
 @theme inline {
+  --color-Custom-Blue: #00378D;
+  --color-Custom-hover-blue: #0049b7;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);

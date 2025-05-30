@@ -1,6 +1,8 @@
 export const dynamic = 'force-dynamic';
 import ProductCard from "./ProductCard";
 import Link from "next/link";
+import Image from 'next/image';
+import heroicon from "@/assets/images/heroicon.jpg";
 
 export default async function Homepage () {
   const baseUrl =
@@ -16,17 +18,43 @@ export default async function Homepage () {
   return (
     <>
       {/* Hero */}
-      <section className="bg-gradient-to-r from-slate-900 to-slate-700 text-white py-24 text-center px-4">
-        <h1 className="text-4xl font-bold mb-4">Explore Summer Collection</h1>
-        <p className="max-w-lg mx-auto text-lg mb-6">
-          Hand-picked products for your summer vibes. Limited stock only!
+    <section className="relative h-[50vh] md:h-[80vh] flex items-center justify-center text-white overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <Image
+          // Assuming your image is in public/images/homepage2-min.jpg as discussed previously
+          src={heroicon}
+          alt="Ecommerce background with various products"
+          fill // This makes the image fill the parent div
+          style={{ objectFit: 'cover' }} // Ensures the image covers the area, like background-size: cover
+          quality={100} // Adjust image quality if needed
+          priority // Prioritize loading for a hero image
+        />
+        {/* Dark Overlay for Text Readability */}
+        <div className="absolute inset-0 bg-black opacity-50"></div>
+      </div>
+
+      {/* Content Overlay */}
+      <div className="mt-10 relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+        {/* Headline */}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 leading-tight">
+          Discover Your Next Favorite Style
+        </h1>
+
+        {/* Paragraph */}
+        <p className="text-lg sm:text-xl md:text-2xl mb-8 opacity-90 leading-relaxed">
+          Explore our handpicked collection of premium products, designed to elevate your everyday.
+          Unleash your unique flair and find what truly moves you.
         </p>
-        <Link href="/shop">
-          <button className="px-6 py-3 bg-white text-black font-semibold rounded hover:bg-gray-200 transition">
-            Shop Now
+
+        {/* CTA Button */}
+        <Link href="/shop" passHref>
+          <button className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full transition duration-300 ease-in-out shadow-lg transform hover:scale-105">
+            Shop the Latest Collection
           </button>
         </Link>
-      </section>
+      </div>
+    </section>
 
       {/* Product Grid */}
               <h2 className="text-2xl text-black pt-8 px-8 font-bold">Featured Products</h2>
