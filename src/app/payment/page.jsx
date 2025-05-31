@@ -1,11 +1,7 @@
+// app/payment/page.jsx
+'use client';
+import PaymentPage from './PaymentPage';
 
-
-const page = () => {
-  return (
-    <div className="flex items-center justify-center h-screen">
-      <h1 className="text-black ">payment page</h1>
-    </div>
-  )
+export default function Page() {
+  return <PaymentPage />;
 }
-
-export default page
