@@ -65,11 +65,6 @@ export async function POST(req) {
                return NextResponse.json({ error: 'Failed to update order status in database.' }, { status: 500 });
           }
 
-          if (!data || data.length === 0) {
-               console.error('Order not found or not updated for Razorpay Order ID:', razorpay_order_id); // Debugging
-               return NextResponse.json({ error: 'Order not found or already processed.' }, { status: 404 });
-          }
-
           console.log('Order status updated in Supabase:', data); // Debugging
 
           return NextResponse.json({ message: 'Payment successful and order updated.' });

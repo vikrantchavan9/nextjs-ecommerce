@@ -5,15 +5,11 @@ import { loadRazorpayScript } from '@/lib/utils';
 import { useState } from 'react';
 import { useCart } from '@/app/context/cart-context';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link'; // Import Link for navigation
 
 const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
   const [loading, setLoading] = useState(false);
   const { clearCart } = useCart();
   const router = useRouter();
-
-  // Determine if the user is logged in based on userId
-  const isLoggedIn = !!userId; // Convert userId to a boolean
 
   const displayRazorpay = async () => {
     setLoading(true);
@@ -65,10 +61,10 @@ const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
           console.log('  response.razorpay_signature:', response.razorpay_signature);
 
           if (!response.razorpay_payment_id || !response.razorpay_signature) {
-            console.error('Handler received incomplete payment data. Payment likely failed or was incomplete.');
-            alert('Payment failed or was incomplete. Please try again.');
-            setLoading(false);
-            return;
+              console.error('Handler received incomplete payment data. Payment likely failed or was incomplete.');
+              alert('Payment failed or was incomplete. Please try again.');
+              setLoading(false);
+              return;
           }
 
           const verifyResponse = await fetch('/api/razorpay/verify', {
@@ -82,37 +78,31 @@ const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
             }),
           });
 
-          // --- CRITICAL DEBUGGING: Read these logs in your browser console ---
+          // --- ADD THESE NEW LOGS FOR VERIFICATION RESPONSE ---
           console.log('Verify API response status:', verifyResponse.status);
           console.log('Verify API response ok:', verifyResponse.ok);
+          // --- END NEW LOGS ---
 
           if (verifyResponse.ok) {
-            console.log('Payment verification successful! Attempting redirect...');
-            clearCart(); // Uncomment if you want to clear cart on success
+            console.log('Payment verification successful! Attempting redirect...'); // Log this
+            // clearCart();
             router.push('/payment-success');
-            console.log('Redirect initiated to /payment-success.');
+            console.log('Redirect initiated to /payment-success.'); // This might not show if redirect happens fast
           } else {
-            // Attempt to parse error data only if response is not ok
-            let errorVerifyData = { error: 'Unknown verification error' };
-            try {
-              errorVerifyData = await verifyResponse.json();
-            } catch (jsonError) {
-              console.error('Failed to parse verification error JSON:', jsonError);
-            }
+            const errorVerifyData = await verifyResponse.json();
             alert(`Payment Verification Failed: ${errorVerifyData.error}`);
-            console.error('Payment Verification Error Response:', errorVerifyData);
-            console.log('Payment verification failed. No redirect.');
+            console.error('Payment Verification Error:', errorVerifyData);
+            console.log('Payment verification failed. No redirect.'); // Log this too
           }
           setLoading(false);
         },
         prefill: {
-          // You might want to prefill name/email/contact here if you have user data
-          // name: "John Doe",
-          // email: "john.doe@example.com",
-          // contact: "9999999999",
+          // name: 'John Doe',
+          // email: 'john.doe@example.com',
+          // contact: '9999999999',
         },
         theme: {
-          color: '#3399CC', // You can use your brand blue here
+          color: '#3399CC',
         },
       };
 
@@ -126,26 +116,11 @@ const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
     }
   };
 
-  // --- Conditional Rendering Logic ---
-  if (!isLoggedIn) {
-    return (
-      <Link href="/login" // Or your register page, e.g., /register
-        className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 ml-2 text-center"
-      >
-        Login / Register to Proceed
-      </Link>
-    );
-  }
-
-  // If logged in, render the Razorpay button
   return (
     <button
       onClick={displayRazorpay}
       disabled={loading || amount <= 0}
-      // Adjusted disabled styling: bg-gray-400 for disabled, green for active hover
-      className="bg-gray-900 text-white px-4 py-2 rounded ml-2
-                 hover:bg-green-600
-                 disabled:bg-gray-400 disabled:cursor-not-allowed"
+      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 ml-2 disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {loading ? 'Processing...' : `Pay with Razorpay (₹${amount.toFixed(2)})`}
     </button>
