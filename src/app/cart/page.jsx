@@ -41,6 +41,7 @@ const CartPage = () => {
     0
   );
 
+  // Determine the currency. 'INR' is standard for Razorpay in India.
   const currency = 'INR';
 
   // --- Debugging logs for values passed to RazorpayButton ---

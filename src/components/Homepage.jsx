@@ -3,6 +3,9 @@ import ProductCard from "./ProductCard";
 import Link from "next/link";
 import Image from 'next/image';
 import heroicon from "@/assets/images/heroicon.jpg";
+import WhyShopWithUs from "./WhyShopWithUs";
+import CustomerTestimonials from "./CustomerTestimonials";
+import NewsletterSignup from "./Newsletter";
 
 export default async function Homepage () {
   const baseUrl =
@@ -24,6 +27,7 @@ export default async function Homepage () {
         <div className="fixed top-0 left-0 w-full h-[80vh] -z-10">
           <Image
             src={heroicon}
+            className="mt-10"
             alt="Ecommerce background with various products"
             fill
             style={{
@@ -39,17 +43,16 @@ export default async function Homepage () {
         </div>
 
         {/* Content Overlay */}
-        <div className="mt-10 relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+        <div className="mt-10 relative text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 leading-tight">
             Discover Your Next Favorite Style
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl mb-8 opacity-90 leading-relaxed">
-            Explore our handpicked collection of premium products, designed to elevate your everyday.
-            Unleash your unique flair and find what truly moves you.
+            Hand-picked products for your summer vibes. Limited stock only!
           </p>
           <Link href="/shop" passHref>
-            <button className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full transition duration-300 ease-in-out shadow-lg transform hover:scale-105">
-              Shop the Latest Collection
+            <button className="inline-block bg-gray-900 hover:bg-gray-900 border border-gray-800 text-white py-3 px-8 rounded transition duration-300 ease-in-out shadow-lg transform hover:scale-105">
+              Shop Now
             </button>
           </Link>
         </div>
@@ -57,11 +60,11 @@ export default async function Homepage () {
 
       {/* Product Grid */}
       <div className="product-grid-container bg-gray-50">
-      <h2 className="text-2xl text-black pt-8 px-8 font-bold">Featured Products</h2>
+      <h2 className="text-2xl text-black pt-8 px-8 font-semibold">Featured Products</h2>
       <section className="max-w-7xl mx-auto py-8 px-8">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {Array.isArray(products) && products.length > 0 ? (
-            products.map((product) => (
+            products.slice(0, 6).map((product) => (
               <ProductCard key={product.id} product={product} />
             ))
           ) : (
@@ -69,6 +72,10 @@ export default async function Homepage () {
           )}
         </div>
       </section>
+
+      <WhyShopWithUs/>
+      <CustomerTestimonials />
+      <NewsletterSignup />
       </div>
     </>
   );

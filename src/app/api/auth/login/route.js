@@ -11,7 +11,7 @@ export default function LoginPage() {
      useEffect(() => {
           const checkUser = async () => {
                const { data: { user } } = await supabase.auth.getUser();
-               if (user) router.push('/shop'); // Redirect if logged in
+               if (user) router.push('/'); // Redirect if logged in
           };
           checkUser();
      }, []);

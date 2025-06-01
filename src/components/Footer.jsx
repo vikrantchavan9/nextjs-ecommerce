@@ -36,7 +36,7 @@ const Footer = () => {
             </a>
           </div>
           <p className="mt-2">Email: vikrantchavan200@gmail.com</p>
-          <p>Phone: +91 8208280387</p>
+          <p>Phone: +91 8608286469</p>
         </div>
       </div>
     </footer>
