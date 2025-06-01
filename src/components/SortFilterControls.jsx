@@ -115,7 +115,7 @@ export default function SortFilterControls() {
                           {option.name}
                         </span>
                         {selected ? (
-                          <span className="absolute inset-y-0 left-0 flex items-center pl-3 ">
+                          <span className="absolute text-green-500 inset-y-0 left-0 flex items-center pl-3 ">
                             {/* Checkmark icon */}
                             <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                               <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.147 1.002l-7.5 10.5a.75.75 0 01-1.172.036l-3.75-3.75a.75.75 0 011.06-1.06l3.19 3.19L15.347 4.3a.75.75 0 011.357-.147z" clipRule="evenodd" />
@@ -171,7 +171,7 @@ export default function SortFilterControls() {
                             {option.name}
                           </span>
                           {selected ? (
-                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 ">
+                            <span className="absolute text-green-500 inset-y-0 left-0 flex items-center pl-3 ">
                               <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.147 1.002l-7.5 10.5a.75.75 0 01-1.172.036l-3.75-3.75a.75.75 0 011.06-1.06l3.19 3.19L15.347 4.3a.75.75 0 011.357-.147z" clipRule="evenodd" /></svg>
                             </span>
                           ) : null}
@@ -223,7 +223,7 @@ export default function SortFilterControls() {
                             {option.name}
                           </span>
                           {selected ? (
-                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 ">
+                            <span className="absolute text-green-500 inset-y-0 left-0 flex items-center pl-3 ">
                               <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.147 1.002l-7.5 10.5a.75.75 0 01-1.172.036l-3.75-3.75a.75.75 0 011.06-1.06l3.19 3.19L15.347 4.3a.75.75 0 011.357-.147z" clipRule="evenodd" /></svg>
                             </span>
                           ) : null}
