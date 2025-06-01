@@ -60,15 +60,15 @@ const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
         order_id: orderData.id,
         handler: async function (response) {
           console.log('Razorpay handler called with response:', response);
-          console.log('   response.razorpay_payment_id:', response.razorpay_payment_id);
-          console.log('   response.razorpay_order_id:', response.razorpay_order_id);
-          console.log('   response.razorpay_signature:', response.razorpay_signature);
+          console.log('  response.razorpay_payment_id:', response.razorpay_payment_id);
+          console.log('  response.razorpay_order_id:', response.razorpay_order_id);
+          console.log('  response.razorpay_signature:', response.razorpay_signature);
 
           if (!response.razorpay_payment_id || !response.razorpay_signature) {
-              console.error('Handler received incomplete payment data. Payment likely failed or was incomplete.');
-              alert('Payment failed or was incomplete. Please try again.');
-              setLoading(false);
-              return;
+            console.error('Handler received incomplete payment data. Payment likely failed or was incomplete.');
+            alert('Payment failed or was incomplete. Please try again.');
+            setLoading(false);
+            return;
           }
 
           const verifyResponse = await fetch('/api/razorpay/verify', {
@@ -82,27 +82,37 @@ const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
             }),
           });
 
+          // --- CRITICAL DEBUGGING: Read these logs in your browser console ---
           console.log('Verify API response status:', verifyResponse.status);
           console.log('Verify API response ok:', verifyResponse.ok);
 
           if (verifyResponse.ok) {
             console.log('Payment verification successful! Attempting redirect...');
-            // clearCart(); // Uncomment if you want to clear cart on success
+            clearCart(); // Uncomment if you want to clear cart on success
             router.push('/payment-success');
             console.log('Redirect initiated to /payment-success.');
           } else {
-            const errorVerifyData = await verifyResponse.json();
+            // Attempt to parse error data only if response is not ok
+            let errorVerifyData = { error: 'Unknown verification error' };
+            try {
+              errorVerifyData = await verifyResponse.json();
+            } catch (jsonError) {
+              console.error('Failed to parse verification error JSON:', jsonError);
+            }
             alert(`Payment Verification Failed: ${errorVerifyData.error}`);
-            console.error('Payment Verification Error:', errorVerifyData);
+            console.error('Payment Verification Error Response:', errorVerifyData);
             console.log('Payment verification failed. No redirect.');
           }
           setLoading(false);
         },
         prefill: {
           // You might want to prefill name/email/contact here if you have user data
+          // name: "John Doe",
+          // email: "john.doe@example.com",
+          // contact: "9999999999",
         },
         theme: {
-          color: '#3399CC',
+          color: '#3399CC', // You can use your brand blue here
         },
       };
 
@@ -132,7 +142,10 @@ const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
     <button
       onClick={displayRazorpay}
       disabled={loading || amount <= 0}
-      className="bg-gray-900 text-white px-4 py-2 rounded hover:bg-green-600 ml-2 disabled:opacity-50 disabled:cursor-not-allowed"
+      // Adjusted disabled styling: bg-gray-400 for disabled, green for active hover
+      className="bg-gray-900 text-white px-4 py-2 rounded ml-2
+                 hover:bg-green-600
+                 disabled:bg-gray-400 disabled:cursor-not-allowed"
     >
       {loading ? 'Processing...' : `Pay with Razorpay (₹${amount.toFixed(2)})`}
     </button>
