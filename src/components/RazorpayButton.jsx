@@ -5,11 +5,15 @@ import { loadRazorpayScript } from '@/lib/utils';
 import { useState } from 'react';
 import { useCart } from '@/app/context/cart-context';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link'; // Import Link for navigation
 
 const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
   const [loading, setLoading] = useState(false);
   const { clearCart } = useCart();
   const router = useRouter();
+
+  // Determine if the user is logged in based on userId
+  const isLoggedIn = !!userId; // Convert userId to a boolean
 
   const displayRazorpay = async () => {
     setLoading(true);
@@ -56,9 +60,9 @@ const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
         order_id: orderData.id,
         handler: async function (response) {
           console.log('Razorpay handler called with response:', response);
-          console.log('  response.razorpay_payment_id:', response.razorpay_payment_id);
-          console.log('  response.razorpay_order_id:', response.razorpay_order_id);
-          console.log('  response.razorpay_signature:', response.razorpay_signature);
+          console.log('   response.razorpay_payment_id:', response.razorpay_payment_id);
+          console.log('   response.razorpay_order_id:', response.razorpay_order_id);
+          console.log('   response.razorpay_signature:', response.razorpay_signature);
 
           if (!response.razorpay_payment_id || !response.razorpay_signature) {
               console.error('Handler received incomplete payment data. Payment likely failed or was incomplete.');
@@ -78,28 +82,24 @@ const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
             }),
           });
 
-          // --- ADD THESE NEW LOGS FOR VERIFICATION RESPONSE ---
           console.log('Verify API response status:', verifyResponse.status);
           console.log('Verify API response ok:', verifyResponse.ok);
-          // --- END NEW LOGS ---
 
           if (verifyResponse.ok) {
-            console.log('Payment verification successful! Attempting redirect...'); // Log this
-            // clearCart();
+            console.log('Payment verification successful! Attempting redirect...');
+            // clearCart(); // Uncomment if you want to clear cart on success
             router.push('/payment-success');
-            console.log('Redirect initiated to /payment-success.'); // This might not show if redirect happens fast
+            console.log('Redirect initiated to /payment-success.');
           } else {
             const errorVerifyData = await verifyResponse.json();
             alert(`Payment Verification Failed: ${errorVerifyData.error}`);
             console.error('Payment Verification Error:', errorVerifyData);
-            console.log('Payment verification failed. No redirect.'); // Log this too
+            console.log('Payment verification failed. No redirect.');
           }
           setLoading(false);
         },
         prefill: {
-          // name: 'John Doe',
-          // email: 'john.doe@example.com',
-          // contact: '9999999999',
+          // You might want to prefill name/email/contact here if you have user data
         },
         theme: {
           color: '#3399CC',
@@ -116,6 +116,18 @@ const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
     }
   };
 
+  // --- Conditional Rendering Logic ---
+  if (!isLoggedIn) {
+    return (
+      <Link href="/login" // Or your register page, e.g., /register
+        className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 ml-2 text-center"
+      >
+        Login / Register to Proceed
+      </Link>
+    );
+  }
+
+  // If logged in, render the Razorpay button
   return (
     <button
       onClick={displayRazorpay}
