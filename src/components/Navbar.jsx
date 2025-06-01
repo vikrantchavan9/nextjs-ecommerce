@@ -41,7 +41,7 @@ const Navbar = () => {
           <Link href="/" className="hover:text-gray-300">Home</Link>
           <Link href="/shop" className="hover:text-gray-300">Browse Products</Link>
           <Link href="/cart" className="hover:text-gray-300">Cart</Link>
-          <Link href="/orders" className="hover:text-gray-300">Orders</Link>
+          <Link href="/orders" className="hover:text-gray-300">My Orders</Link>
           <Link href="/about" className="hover:text-gray-300">About</Link>
           <Link href="/contact" className="hover:text-gray-300">Contact</Link>
           <button onClick={handleAuthAction} className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600">
@@ -67,7 +67,7 @@ const Navbar = () => {
         {/* Mobile Menu - POSITIONED ABSOLUTELY */}
         {isMobileMenuOpen && (
           <div
-            className="md:hidden bg-gray-900 absolute top-full left-2 right-0 p-4 shadow-lg"
+            className="md:hidden bg-gray-900 absolute top-full left-0 right-0 p-4 shadow-lg"
             // Optional: You might want to make it span full width or adjust based on your design
             // If you want it to cover content (overlay), consider z-index as well.
           >
@@ -93,7 +93,7 @@ const Navbar = () => {
                 </svg>
               </button>
               {isSectionsDropdownOpen && (
-                <div className="block pl-4 mt-2">
+                <div className="pl-4 mt-2">
                   <Link href="/shop?section=men" className="block py-2 hover:bg-gray-600 rounded">Men</Link>
                   <Link href="/shop?section=women" className="block py-2 hover:bg-gray-600 rounded">Women</Link>
                   <Link href="/shop?section=kids" className="block py-2 hover:bg-gray-600 rounded">Kids</Link>
@@ -110,70 +110,6 @@ const Navbar = () => {
           </div>
         )}
       </div>
-
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-gray-700 mt-2 p-4">
-          <Link href="/" className="block py-2 hover:bg-gray-600 rounded">
-            Home
-          </Link>
-          <Link href="/about" className="block py-2 hover:bg-gray-600 rounded">
-            About
-          </Link>
-          <Link href="/shop" className="block py-2 hover:bg-gray-600 rounded">
-            View Products
-          </Link>
-          <div className="">
-            <button
-              onClick={() => setIsSectionsDropdownOpen(!isSectionsDropdownOpen)}
-              className="w-full text-left py-2 hover:bg-gray-600 rounded flex items-center justify-between"
-            >
-              Browse by Section
-              <svg
-                className={`h-4 w-4 transform transition-transform duration-200 ${
-                  isSectionsDropdownOpen ? 'rotate-180' : ''
-                }`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </button>
-            {isSectionsDropdownOpen && (
-              <div className="pl-4 mt-2">
-                <Link href="/shop?section=men" className="block py-2 hover:bg-gray-600 rounded">
-                  Men
-                </Link>
-                <Link href="/shop?section=women" className="block py-2 hover:bg-gray-600 rounded">
-                  Women
-                </Link>
-                <Link href="/shop?section=kids" className="block py-2 hover:bg-gray-600 rounded">
-                  Kids
-                </Link>
-                <Link href="/shop?section=unisex" className="block py-2 hover:bg-gray-600 rounded">
-                  Unisex
-                </Link>
-              </div>
-            )}
-          </div>
-          <Link href="/cart" className="block py-2 hover:bg-gray-600 rounded">
-            My Cart
-          </Link>
-           <Link href="/orders" className="block py-2 hover:bg-gray-600 rounded">
-            My Orders
-          </Link>           
-
-          <Link href="/contact" className="block py-2 hover:bg-gray-600 rounded">
-            Contact
-          </Link>
-
-          <button onClick={handleAuthAction} className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600">
-            {user ? 'Logout' : 'Login'}
-          </button>
-        </div>
-      )}
     </nav>
   );
 };
