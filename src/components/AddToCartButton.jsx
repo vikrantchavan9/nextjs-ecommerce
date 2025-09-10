@@ -1,61 +1,54 @@
 'use client';
 
 import { useCart } from '../app/context/cart-context';
-import { useState, useEffect } from 'react'; // Import useState and useEffect
+import { useState, useEffect } from 'react';
+import { CheckCircle } from 'lucide-react';
 
 export default function AddToCartButton({ product }) {
   const { addToCart } = useCart();
-  const [showAlert, setShowAlert] = useState(false); // State to control alert visibility
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertProduct, setAlertProduct] = useState(null);
 
   const handleAddToCart = () => {
     addToCart(product);
-    console.log("Product added:", product);
-    setShowAlert(true); // Show the alert
+    setAlertProduct(product);
+    setShowAlert(true);
   };
 
-  // Effect to hide the alert after a few seconds
   useEffect(() => {
     if (showAlert) {
       const timer = setTimeout(() => {
         setShowAlert(false);
+        setAlertProduct(null);
       }, 3000); // Hide after 3 seconds
-      return () => clearTimeout(timer); // Cleanup the timer
+      return () => clearTimeout(timer);
     }
   }, [showAlert]);
 
   return (
-    <div>
+    <div className="relative">
+      {/* Main Add to Cart Button */}
       <button
-        className='mt-8 px-6 py-2 bg-black text-white rounded hover:bg-slate-800 transition'
+        className="w-full mt-6 px-8 py-3 bg-gray-900 text-white font-semibold rounded-full shadow-lg transition-all duration-300 hover:scale-105 hover:bg-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-300"
         onClick={handleAddToCart}
       >
         Add to Cart
       </button>
 
-      {/* Custom Modern Alert */}
-      {showAlert && (
-        <div className="fixed bottom-5 right-5 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 animate-fade-in-up">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>Added to cart successfully!</span>
+      {/* Modern, Sleek Alert */}
+      {showAlert && alertProduct && (
+        <div className="fixed bottom-6 right-6 z-50 p-4 rounded-2xl shadow-xl backdrop-blur-md bg-white/80 flex items-center space-x-3 transform transition-all duration-300 animate-slide-in-up">
+          <CheckCircle className="h-8 w-8 text-green-500 animate-pulse-once" />
+          <div className="flex-1">
+            <h3 className="font-bold text-gray-900">Success!</h3>
+            <p className="text-sm text-gray-600">"{alertProduct.name}" added to cart.</p>
+          </div>
         </div>
       )}
-
-      {/* Basic Tailwind CSS for the fade-in-up animation (add to your global CSS or a dedicated CSS file) */}
+      
+      {/* Custom Tailwind CSS keyframes for animations */}
       <style jsx>{`
-        @keyframes fade-in-up {
+        @keyframes slide-in-up {
           from {
             opacity: 0;
             transform: translateY(20px);
@@ -65,8 +58,16 @@ export default function AddToCartButton({ product }) {
             transform: translateY(0);
           }
         }
-        .animate-fade-in-up {
-          animation: fade-in-up 0.5s ease-out forwards;
+        @keyframes pulse-once {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.1); }
+          100% { transform: scale(1); }
+        }
+        .animate-slide-in-up {
+          animation: slide-in-up 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        .animate-pulse-once {
+          animation: pulse-once 0.6s ease-in-out;
         }
       `}</style>
     </div>
