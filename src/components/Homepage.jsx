@@ -58,25 +58,38 @@ export default async function Homepage () {
         </div>
       </section>
 
-      {/* Product Grid */}
-      <div className="product-grid-container bg-gray-50">
-      <h2 className="text-2xl text-black pt-8 px-8 font-semibold">Featured Products</h2>
-      <section className="max-w-7xl mx-auto py-8 px-8">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-          {Array.isArray(products) && products.length > 0 ? (
-            products.slice(0, 6).map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))
-          ) : (
-            <p className="col-span-full text-center text-gray-500">No products found.</p>
-          )}
-        </div>
-      </section>
+            {/* Main Content Sections */}
+      <main className="bg-gray-50 ">
+        {/* Featured Products Section */}
+        <section className="max-w-7xl mx-auto py-16 px-4 md:px-8">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900">Featured Products</h2>
+            <Link href="/shop" className="text-gray-600 font-semibold hover:text-gray-800 transition-colors">
+              View All &rarr;
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 lg:gap-8">
+            {Array.isArray(products) && products.length > 0 ? (
+              products.slice(0, 8).map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))
+            ) : (
+              <p className="col-span-full text-center text-gray-500">No products found.</p>
+            )}
+          </div>
+        </section>
 
-      <WhyShopWithUs/>
-      <CustomerTestimonials />
-      <NewsletterSignup />
-      </div>
+        {/* Other components with consistent padding */}
+        <div className="py-16 bg-gray-900">
+          <WhyShopWithUs />
+        </div>
+        <div className="py-16 bg-gray-900">
+          <CustomerTestimonials />
+        </div>
+        <div className="py-16 bg-gray-900">
+          <NewsletterSignup />
+        </div>
+      </main>
     </>
   );
 }

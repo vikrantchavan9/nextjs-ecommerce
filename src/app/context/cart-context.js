@@ -46,8 +46,13 @@ export const CartProvider = ({ children }) => {
      };
 
 
-     // Decrease quantity or remove product entirely
+     // New function: Completely remove a product from the cart
      const removeFromCart = (id) => {
+          setCartItems((prev) => prev.filter((item) => item.id !== id));
+     };
+
+     // New function: Decrease quantity or remove if quantity becomes zero
+     const decreaseQuantity = (id) => {
           setCartItems((prev) =>
                prev
                     .map((item) =>
@@ -77,7 +82,7 @@ export const CartProvider = ({ children }) => {
 
 
      return (
-          <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, increaseQuantity }}>
+          <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, increaseQuantity, decreaseQuantity }}>
                {children}
           </CartContext.Provider>
      );

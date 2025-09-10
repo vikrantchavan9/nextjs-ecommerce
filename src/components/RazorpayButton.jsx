@@ -120,7 +120,7 @@ const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
     <button
       onClick={displayRazorpay}
       disabled={loading || amount <= 0}
-      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 ml-2 disabled:opacity-50 disabled:cursor-not-allowed"
+      className="bg-blue-700 text-white text-sm px-6 py-2 rounded hover:bg-blue-800 ml-2 disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {loading ? 'Processing...' : `Pay with Razorpay (₹${amount.toFixed(2)})`}
     </button>

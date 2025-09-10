@@ -36,10 +36,10 @@ export default function AboutPage() {
       <section className="relative h-96 flex items-center justify-center text-center bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1517457375827-80fdb7499684?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')" }}>
         <div className="absolute inset-0 bg-white "></div> {/* Overlay for better text readability */}
         <div className="relative z-10 px-4">
-          <h1 className="text-5xl text-gray-900 sm:text-6xl font-bold mb-4 animate-fade-in-up">
+          <h1 className="text-4xl md:text-5xl text-gray-900 sm:text-6xl font-bold mb-4 animate-fade-in-up">
             Our Story
           </h1>
-          <p className="text-xl sm:text-2xl text-gray-800 animate-fade-in-up delay-100">
+          <p className="text-md md:text-2xl text-gray-800 animate-fade-in-up delay-100">
             Passionately curated fashion for every unique individual.
           </p>
         </div>
@@ -105,7 +105,7 @@ export default function AboutPage() {
           <p className="text-xl text-gray-300 mb-10">
             Explore our diverse collections and find the perfect pieces that reflect your unique personality.
           </p>
-          <Link href="/shop" className="inline-block px-10 py-4 bg-blue-600 text-white text-xl font-semibold rounded-full shadow-lg hover:bg-blue-700 transition-colors duration-300 transform hover:scale-105">
+          <Link href="/shop" className="inline-block px-10 py-3 bg-blue-600 text-white text-md font-normal rounded-full shadow-lg hover:bg-blue-700 transition-colors duration-300 transform hover:scale-105">
             Shop Now
           </Link>
         </div>
