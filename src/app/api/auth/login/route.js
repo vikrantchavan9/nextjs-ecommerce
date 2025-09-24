@@ -1,29 +1,29 @@
-'use client';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+// src/app/api/auth/login/route.js
+import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { Auth } from '@supabase/auth-ui-react';
-import { ThemeSupa } from '@supabase/auth-ui-shared';
+import bcrypt from 'bcryptjs';
 
-export default function LoginPage() {
-     const router = useRouter();
+export async function POST(request) {
+     try {
+          const { email, password } = await request.json();
 
-     useEffect(() => {
-          const checkUser = async () => {
-               const { data: { user } } = await supabase.auth.getUser();
-               if (user) router.push('/'); // Redirect if logged in
-          };
-          checkUser();
-     }, []);
+          const { data, error } = await supabase
+               .from("users")
+               .select("*")
+               .eq("email", email)
+               .single();
 
-     return (
-          <div className="flex justify-center items-center h-screen">
-               <Auth
-                    supabaseClient={supabase}
-                    providers={['google']}
-                    appearance={{ theme: ThemeSupa }}
-                    theme="dark"
-               />
-          </div>
-     );
+          if (error || !data) {
+               return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+          }
+
+          const match = await bcrypt.compare(password, data.password);
+          if (!match) {
+               return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+          }
+
+          return NextResponse.json(data);
+     } catch (error) {
+          return NextResponse.json({ error: "Login failed" }, { status: 500 });
+     }
 }

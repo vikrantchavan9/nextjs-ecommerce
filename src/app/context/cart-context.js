@@ -22,7 +22,7 @@ export const CartProvider = ({ children }) => {
      useEffect(() => {
           try {
                localStorage.setItem('cart', JSON.stringify(cartItems));
-               console.log('Cart updated:', cartItems);
+               // console.log('Cart updated:', cartItems);
           } catch (err) {
                console.error('Failed to save cart to localStorage', err);
           }

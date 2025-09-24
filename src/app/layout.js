@@ -4,6 +4,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { CartProvider } from "./context/cart-context";
 import React from 'react';
+import { AuthProvider } from "./context/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,13 +28,16 @@ export default function RootLayout({ children }) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="shortcut icon" href="#"></link>
+        {/* Google Identity Services SDK */}
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+
       </head>
       <body>
         <React.StrictMode>
           <Navbar />
           <main className="min-h-[calc(100vh-128px)] ">
             <CartProvider>
-              {children}
+              <AuthProvider>{children}</AuthProvider>
             </CartProvider>
           </main>
           <Footer />

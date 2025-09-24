@@ -8,11 +8,12 @@ import { useRouter } from 'next/navigation';
 
 const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
   const [loading, setLoading] = useState(false);
-  const { clearCart } = useCart();
+  // const { clearCart } = useCart();
   const router = useRouter();
 
   const displayRazorpay = async () => {
     setLoading(true);
+
     const res = await loadRazorpayScript();
 
     if (!res) {
@@ -24,7 +25,10 @@ const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
     try {
       const orderResponse = await fetch('/api/razorpay/order', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
         body: JSON.stringify({
           amount: Math.round(amount * 100),
           currency,
@@ -45,7 +49,6 @@ const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
       }
 
       const orderData = await orderResponse.json();
-      console.log('Razorpay Order Created (from /api/razorpay/order):', orderData);
 
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
@@ -55,21 +58,19 @@ const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
         description: 'Payment for your order',
         order_id: orderData.id,
         handler: async function (response) {
-          console.log('Razorpay handler called with response:', response);
-          console.log('  response.razorpay_payment_id:', response.razorpay_payment_id);
-          console.log('  response.razorpay_order_id:', response.razorpay_order_id);
-          console.log('  response.razorpay_signature:', response.razorpay_signature);
-
           if (!response.razorpay_payment_id || !response.razorpay_signature) {
-              console.error('Handler received incomplete payment data. Payment likely failed or was incomplete.');
-              alert('Payment failed or was incomplete. Please try again.');
-              setLoading(false);
-              return;
+            alert('Payment failed or was incomplete. Please try again.');
+            setLoading(false);
+            return;
           }
 
+          // Verify payment
           const verifyResponse = await fetch('/api/razorpay/verify', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json'
+            },
+            credentials: 'include',
             body: JSON.stringify({
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_order_id: response.razorpay_order_id,
@@ -78,32 +79,29 @@ const RazorpayButton = ({ amount, currency, userId, cartItems }) => {
             }),
           });
 
-          // --- ADD THESE NEW LOGS FOR VERIFICATION RESPONSE ---
-          console.log('Verify API response status:', verifyResponse.status);
-          console.log('Verify API response ok:', verifyResponse.ok);
-          // --- END NEW LOGS ---
-
           if (verifyResponse.ok) {
-            console.log('Payment verification successful! Attempting redirect...'); // Log this
+            // Payment successful
             // clearCart();
+            alert('Payment successful!');
             router.push('/payment-success');
-            console.log('Redirect initiated to /payment-success.'); // This might not show if redirect happens fast
           } else {
-            const errorVerifyData = await verifyResponse.json();
-            alert(`Payment Verification Failed: ${errorVerifyData.error}`);
-            console.error('Payment Verification Error:', errorVerifyData);
-            console.log('Payment verification failed. No redirect.'); // Log this too
+            // Payment verification failed
+            alert('Payment verification failed. Please contact support.');
           }
+          
           setLoading(false);
         },
         prefill: {
-          // name: 'John Doe',
-          // email: 'john.doe@example.com',
-          // contact: '9999999999',
+          // Add user details here if needed
         },
         theme: {
           color: '#3399CC',
         },
+        modal: {
+          ondismiss: function() {
+            setLoading(false);
+          }
+        }
       };
 
       const paymentObject = new window.Razorpay(options);

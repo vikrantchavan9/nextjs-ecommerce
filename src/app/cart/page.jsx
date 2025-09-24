@@ -9,21 +9,33 @@ import Image from 'next/image';
 import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
 
 const CartPage = () => {
-  const { cartItems, removeFromCart, increaseQuantity, decreaseQuantity, clearCart } = useCart();
+  const { cartItems, removeFromCart, increaseQuantity, decreaseQuantity } = useCart();
   const [userId, setUserId] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const supabase = createClientComponentClient();
 
   useEffect(() => {
-    const getUser = async () => {
+    const getUserFromCookie = () => {
       setLoadingUser(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserId(user.id);
+      
+      // Get userId from cookie (your custom auth system)
+      const userIdCookie = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('userId='));
+      
+      if (userIdCookie) {
+        const userId = userIdCookie.split('=')[1];
+        setUserId(userId);
+        console.log('Found userId in cookie:', userId); // Debug log
+      } else {
+        setUserId(null);
+        console.log('No userId cookie found'); // Debug log
       }
+      
       setLoadingUser(false);
     };
-    getUser();
+    
+    getUserFromCookie();
   }, []);
 
   const grandTotal = cartItems.reduce(

@@ -47,14 +47,14 @@ const CustomerTestimonials = () => {
   return (
     <section className="bg-gray-800 text-white py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto text-center">
-        <h2 className="text-3xl sm:text-4xl font-extrabold mb-12">
+        <h2 className="text-3xl sm:text-4xl font-bold mb-12">
           What Our Customers Say
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {testimonials.map((testimonial) => (
             <div key={testimonial.id} className="bg-gray-900 p-8 rounded-lg shadow-xl flex flex-col items-center text-center transition-transform duration-300 hover:scale-105">
               <StarRating rating={testimonial.rating} />
-              <p className="text-lg italic mb-6">"{testimonial.quote}"</p>
+              <p className="text-md italic mb-6">"{testimonial.quote}"</p>
               <div className="flex items-center">
                 <img
                   src={testimonial.avatar}

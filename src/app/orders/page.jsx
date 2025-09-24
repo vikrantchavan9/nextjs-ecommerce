@@ -10,22 +10,28 @@ export default function OrdersPage() {
   const [error, setError] = useState(null);
   const supabase = createClientComponentClient();
 
-  useEffect(() => {
+   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
       setError(null);
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
+      
+      // Get user ID from cookie
+      const userIdCookie = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('userId='));
+        
+      if (!userIdCookie) {
         setError('Please log in to view your orders.');
         setLoading(false);
         return;
       }
+      
+      const userId = userIdCookie.split('=')[1];
 
       const { data, error } = await supabase
         .from('orders')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -39,6 +45,7 @@ export default function OrdersPage() {
 
     fetchOrders();
   }, []);
+
 
   if (loading) {
     return (
