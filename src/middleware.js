@@ -6,9 +6,9 @@ export function middleware(req) {
      const { pathname } = req.nextUrl;
 
      // Protect admin-only routes
-     if (pathname.startsWith("/admin-dashboard")) {
+     if (pathname.startsWith("/admin")) {
           if (role !== "admin") {
-               return NextResponse.redirect(new URL("/", req.url));
+               return NextResponse.redirect(new URL("/main", req.url));
           }
      }
 
@@ -18,6 +18,6 @@ export function middleware(req) {
 // Configure which routes should trigger middleware
 export const config = {
      matcher: [
-          "/admin-dashboard/:path*", // protect admin dashboard
+          "/admin/:path*", // protect admin dashboard
      ],
 };

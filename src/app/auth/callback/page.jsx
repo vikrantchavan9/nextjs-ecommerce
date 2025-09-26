@@ -13,11 +13,11 @@ export default function AuthCallback() {
         if (user.role === "admin") {
           router.push("/admin");
         } else {
-          router.push("/");
+          router.push("/main");
         }
       } catch (err) {
         console.error("OAuth error:", err.message);
-        router.push("/login");
+        router.push("/auth/login");
       }
     }
     processOAuth();

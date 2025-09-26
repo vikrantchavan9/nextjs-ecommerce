@@ -10,7 +10,7 @@ export default function AdminNavbar() {
   async function handleLogout() {
     await supabase.auth.signOut(); // if you are using custom cookie/session, clear it here
     document.cookie = "token=; Max-Age=0; path=/;";
-    router.push("/login");
+    router.push("/auth/login");
   }
 
   const links = [
@@ -21,7 +21,9 @@ export default function AdminNavbar() {
 
   return (
     <nav className="bg-gray-900 text-white px-6 py-3 flex items-center justify-between">
-      <h1 className="text-lg font-bold">Admin Dashboard</h1>
+      <Link href="/admin" className="text-l md:text-2xl font-semibold tracking-tight">
+          Admin Dashboard
+        </Link>
       <div className="flex gap-6">
         {links.map((link) => (
           <Link

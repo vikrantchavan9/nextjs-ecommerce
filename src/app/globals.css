@@ -1,27 +1,27 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #909090;
-}
-
 @theme inline {
-  --color-Custom-Blue: #00378D;
-  --color-Custom-hover-blue: #0049b7;
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #dedede;
-    --foreground: #ededed;
-  }
+
+@theme {
+  /* Configure font families to use your Next.js font variables */
+  --font-family-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-family-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
+@theme {
+  /* Custom color palette */
+  --color-background: #F9F6F2;
+  /* Soft, warm off-white */
+  --color-text-primary: #241D1D;
+  /* Dark Mocha */
+  --color-text-muted: #8c7a6b;
+  /* Lighter, muted brown */
+  --color-accent: #262626;
+  /* Mocha Mousse accent */
+  --color-accent-dark: #000000;
+  /* Darker accent for hover */
 }
