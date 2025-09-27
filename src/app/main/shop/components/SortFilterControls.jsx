@@ -104,14 +104,17 @@ export default function SortFilterControls() {
     { value: '', name: 'All Categories' },
     { value: 't-shirt', name: 'T-Shirt' },
     { value: 'trouser', name: 'Trouser' },
-    // ... other categories
+    { value: 'dress', name: 'Dress' },
+    { value: 'skirt', name: 'Skirt' },
+    { value: 'top', name: 'Tops' },
   ];
 
   const sectionOptions = [
     { value: '', name: 'All Sections' },
     { value: 'men', name: 'Men' },
     { value: 'women', name: 'Women' },
-    // ... other sections
+    { value: 'unisex', name: 'Unisex' },
+    { value: 'kids', name: 'Kids' },
   ];
 
   return (

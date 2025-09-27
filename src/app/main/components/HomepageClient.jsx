@@ -149,22 +149,7 @@ export default function HomepageClient({ products }) {
             </div>
           </section>
         </AnimatedSection>
-
-        {/* 5. Placeholder for other components like Newsletter, FAQ etc. */}
-        <AnimatedSection>
-            <div className="container px-4 py-20 mx-auto md:py-32">
-                <NewsletterSignup />
-            </div>
-        </AnimatedSection>
       </main>
-
-      {/* 6. Massive Footer Placeholder */}
-      <footer className="py-20 text-white bg-text-primary">
-          <div className="container px-4 mx-auto text-center">
-            <h2 className="text-2xl font-bold">Celestial Threads</h2>
-            <p className="mt-2 text-text-muted">A massive, comprehensive footer with all your links, social media, and company info would go here.</p>
-          </div>
-      </footer>
     </div>
   );
 }
